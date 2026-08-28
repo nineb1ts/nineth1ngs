@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using nineth1ngs.Models;
 using nineth1ngs.Services;
+using System.Windows.Threading;
 
 namespace nineth1ngs.ViewModels;
 
@@ -11,6 +12,7 @@ public partial class MainViewModel : ObservableObject
     private readonly Th1ngStore store;
     private readonly Func<Th1ng, Task<bool>> confirmDelete;
     private readonly Action<string> showError;
+    private readonly DispatcherTimer timer;
 
     public MainViewModel(
         Th1ngStore store,
@@ -20,6 +22,9 @@ public partial class MainViewModel : ObservableObject
         this.store = store;
         this.confirmDelete = confirmDelete ?? (_ => Task.FromResult(false));
         this.showError = showError ?? (_ => { });
+        timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        timer.Tick += TimerTick;
+        timer.Start();
     }
 
     public ObservableCollection<Th1ng> OpenTh1ngs { get; } = [];
@@ -113,6 +118,29 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task ToggleTimerAsync(Th1ng th1ng)
+    {
+        if (th1ng.IsTimerRunning)
+        {
+            await PauseTimerAsync(th1ng);
+            return;
+        }
+
+        var previousTimerStartedAt = th1ng.TimerStartedAt;
+        th1ng.TimerStartedAt = DateTime.UtcNow;
+
+        try
+        {
+            await store.UpdateAsync(th1ng);
+        }
+        catch (Exception exception)
+        {
+            th1ng.TimerStartedAt = previousTimerStartedAt;
+            ReportError("The timer could not be started.", exception);
+        }
+    }
+
+    [RelayCommand]
     private async Task DeleteTh1ngAsync(Th1ng th1ng)
     {
         if (!await confirmDelete(th1ng))
@@ -192,5 +220,35 @@ public partial class MainViewModel : ObservableObject
     {
         var details = exception is null ? string.Empty : $"\n\n{exception.Message}";
         showError($"{message}{details}");
+    }
+
+    private async Task PauseTimerAsync(Th1ng th1ng)
+    {
+        var previousElapsedSeconds = th1ng.ElapsedSeconds;
+        var previousTimerStartedAt = th1ng.TimerStartedAt;
+        th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds();
+        th1ng.TimerStartedAt = null;
+
+        try
+        {
+            await store.UpdateAsync(th1ng);
+        }
+        catch (Exception exception)
+        {
+            th1ng.ElapsedSeconds = previousElapsedSeconds;
+            th1ng.TimerStartedAt = previousTimerStartedAt;
+            ReportError("The timer could not be paused.", exception);
+        }
+    }
+
+    private void TimerTick(object? sender, EventArgs e)
+    {
+        foreach (var th1ng in OpenTh1ngs.Concat(DoneTh1ngs))
+        {
+            if (th1ng.IsTimerRunning)
+            {
+                th1ng.RefreshTimerDisplay();
+            }
+        }
     }
 }

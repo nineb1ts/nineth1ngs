@@ -107,11 +107,53 @@
                         </TextBox>
                         <TextBlock Text="{Binding CreatedAt, Converter={StaticResource TimestampConverter}}"
                                    Style="{StaticResource TimestampStyle}" />
+                        <TextBlock Text="{Binding ElapsedTimeText}"
+                                   Margin="0,2,0,0"
+                                   FontFamily="Segoe UI Variable Small"
+                                   FontSize="10"
+                                   Foreground="{StaticResource AccentBrush}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1"
                                 Margin="8,0,0,0"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
+                        <Button Style="{StaticResource CompletionIconButtonStyle}"
+                                Command="{Binding DataContext.ToggleTimerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}"
+                                ToolTip="Start or pause timer">
+                            <Grid Width="15" Height="15">
+                                <Path Data="{StaticResource PlayGeometry}"
+                                      Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1">
+                                    <Path.Style>
+                                        <Style TargetType="Path">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsTimerRunning}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Path.Style>
+                                </Path>
+                                <Path Data="{StaticResource PauseGeometry}"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round">
+                                    <Path.Style>
+                                        <Style TargetType="Path">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsTimerRunning}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Path.Style>
+                                </Path>
+                            </Grid>
+                        </Button>
                         <Button Style="{StaticResource CompletionIconButtonStyle}"
                                 Command="{Binding DataContext.ToggleCompletionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
