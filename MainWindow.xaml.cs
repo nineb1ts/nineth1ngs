@@ -1,6 +1,8 @@
 ﻿using nineth1ngs.Services;
 using nineth1ngs.ViewModels;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Input;
 
 namespace nineth1ngs;
@@ -29,6 +31,24 @@ public partial class MainWindow : Window
 
         Loaded += MainWindowLoaded;
         Closed += MainWindowClosed;
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+
+        if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+        {
+            return;
+        }
+
+        var windowHandle = new WindowInteropHelper(this).Handle;
+        var cornerPreference = 2;
+        _ = DwmSetWindowAttribute(
+            windowHandle,
+            DwmWindowCornerPreferenceAttribute,
+            ref cornerPreference,
+            sizeof(int));
     }
 
     private Task<bool> ConfirmDeleteAsync(Models.Th1ng th1ng)
@@ -102,4 +122,13 @@ public partial class MainWindow : Window
             MessageBoxButton.OK,
             MessageBoxImage.Error);
     }
+
+    private const int DwmWindowCornerPreferenceAttribute = 33;
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(
+        IntPtr windowHandle,
+        int attribute,
+        ref int value,
+        int valueSize);
 }

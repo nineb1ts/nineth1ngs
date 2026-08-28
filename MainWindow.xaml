@@ -24,7 +24,7 @@
         <shell:WindowChrome CaptionHeight="0"
                             ResizeBorderThickness="6"
                             GlassFrameThickness="0"
-                            CornerRadius="12" />
+                            CornerRadius="0" />
     </shell:WindowChrome.WindowChrome>
     <Window.Resources>
         <services:TimestampDisplayConverter x:Key="TimestampConverter" />
@@ -173,7 +173,7 @@
         <Border Background="{StaticResource WindowBackgroundBrush}"
             BorderBrush="{StaticResource BorderBrush}"
             BorderThickness="1"
-            CornerRadius="12">
+            CornerRadius="0">
         <Grid Background="{StaticResource WindowBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="42" />
