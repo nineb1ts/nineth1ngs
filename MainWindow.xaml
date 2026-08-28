@@ -135,8 +135,7 @@
                                     </Path.Style>
                                 </Path>
                                 <Path x:Name="ReopenIcon"
-                                      Data="{StaticResource ReopenGeometry}"
-                                      Visibility="Collapsed"
+                                      Data="{StaticResource ReopenArrowGeometry}"
                                       Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
                                       StrokeThickness="1.5"
                                       StrokeStartLineCap="Round"
@@ -144,6 +143,7 @@
                                       StrokeLineJoin="Round">
                                     <Path.Style>
                                         <Style TargetType="Path">
+                                            <Setter Property="Visibility" Value="Collapsed" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsCompleted}" Value="True">
                                                     <Setter Property="Visibility" Value="Visible" />
@@ -158,9 +158,9 @@
                                 Command="{Binding DataContext.DeleteTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 ToolTip="Delete th1ng">
-                            <Path Data="{StaticResource DeleteGeometry}"
+                            <Path Data="{StaticResource CloseGeometry}"
                                   Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.3"
+                                StrokeThickness="1.4"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round" />
@@ -170,7 +170,11 @@
             </Border>
         </DataTemplate>
     </Window.Resources>
-    <Grid Background="{StaticResource WindowBackgroundBrush}">
+        <Border Background="{StaticResource WindowBackgroundBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="12">
+        <Grid Background="{StaticResource WindowBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="42" />
             <RowDefinition Height="38" />
@@ -190,8 +194,8 @@
                         Margin="16,0,0,0"
                         Orientation="Horizontal"
                         VerticalAlignment="Center">
-                <svgc:SvgViewbox Width="18"
-                         Height="18"
+                <svgc:SvgViewbox Width="25"
+                         Height="25"
                          Stretch="Uniform"
                          Source="logo.svg"
                          ToolTip="nineth1ngs logo" />
@@ -370,4 +374,5 @@
             </Grid>
         </Border>
     </Grid>
+    </Border>
 </Window>
