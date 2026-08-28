@@ -76,6 +76,8 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" MinWidth="0">
+                        <TextBlock Text="{Binding CreatedAt, Converter={StaticResource TimestampConverter}}"
+                                   Style="{StaticResource TimestampStyle}" />
                         <TextBlock Text="{Binding Text}"
                                    Style="{StaticResource Th1ngTextStyle}">
                             <TextBlock.InputBindings>
@@ -105,12 +107,11 @@
                                             CommandParameter="{Binding}" />
                             </TextBox.InputBindings>
                         </TextBox>
-                        <TextBlock Text="{Binding CreatedAt, Converter={StaticResource TimestampConverter}}"
-                                   Style="{StaticResource TimestampStyle}" />
                         <TextBlock Text="{Binding ElapsedTimeText}"
                                    Margin="0,2,0,0"
                                    FontFamily="Segoe UI Variable Small"
-                                   FontSize="10"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
                                    Foreground="{StaticResource AccentBrush}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1"

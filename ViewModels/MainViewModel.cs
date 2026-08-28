@@ -122,8 +122,17 @@ public partial class MainViewModel : ObservableObject
     {
         if (th1ng.IsTimerRunning)
         {
-            await PauseTimerAsync(th1ng);
+            _ = await PauseTimerAsync(th1ng);
             return;
+        }
+
+        foreach (var runningTh1ng in OpenTh1ngs.Concat(DoneTh1ngs)
+                     .Where(candidate => candidate.IsTimerRunning && !ReferenceEquals(candidate, th1ng)))
+        {
+            if (!await PauseTimerAsync(runningTh1ng))
+            {
+                return;
+            }
         }
 
         var previousTimerStartedAt = th1ng.TimerStartedAt;
@@ -222,7 +231,7 @@ public partial class MainViewModel : ObservableObject
         showError($"{message}{details}");
     }
 
-    private async Task PauseTimerAsync(Th1ng th1ng)
+    private async Task<bool> PauseTimerAsync(Th1ng th1ng)
     {
         var previousElapsedSeconds = th1ng.ElapsedSeconds;
         var previousTimerStartedAt = th1ng.TimerStartedAt;
@@ -232,12 +241,14 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.UpdateAsync(th1ng);
+            return true;
         }
         catch (Exception exception)
         {
             th1ng.ElapsedSeconds = previousElapsedSeconds;
             th1ng.TimerStartedAt = previousTimerStartedAt;
             ReportError("The timer could not be paused.", exception);
+            return false;
         }
     }
 

@@ -100,9 +100,6 @@
                                 <Setter TargetName="WindowButtonBorder" Property="Background" Value="{StaticResource SurfaceHoverBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}" />
                             </Trigger>
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="WindowButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                            </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="WindowButtonBorder" Property="Background" Value="{StaticResource AccentBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource WindowBackgroundBrush}" />
@@ -138,9 +135,6 @@
                                 <Setter TargetName="IconButtonBorder" Property="Background" Value="{StaticResource SurfaceHoverBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}" />
                             </Trigger>
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="IconButtonBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
-                            </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="IconButtonBorder" Property="Background" Value="{StaticResource AccentBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource WindowBackgroundBrush}" />
@@ -160,10 +154,6 @@
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
-                    <Setter Property="Opacity" Value="1" />
-                </Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
                     <Setter Property="Opacity" Value="1" />
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
@@ -216,10 +206,6 @@
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
-                    <Setter Property="Opacity" Value="1" />
-                </Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource AccentHoverBrush}" />
                     <Setter Property="Opacity" Value="1" />
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
