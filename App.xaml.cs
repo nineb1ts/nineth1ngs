@@ -23,6 +23,8 @@ public partial class App : Application
 			var mainWindow = new MainWindow(new Th1ngStore(), settingsService, settingsService.Load());
 			MainWindow = mainWindow;
 			mainWindow.Show();
+			mainWindow.Activate();
+			mainWindow.Focus();
 		}
 		catch (Exception exception)
 		{
