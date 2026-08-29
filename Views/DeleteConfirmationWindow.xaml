@@ -38,6 +38,23 @@
                            FontSize="13"
                            Foreground="{StaticResource PrimaryTextBrush}" />
             </Border>
+            <TextBlock Text="{Binding SubTh1ngMessage}"
+                       Margin="0,10,0,0"
+                       TextWrapping="Wrap"
+                       FontFamily="Segoe UI Variable Small"
+                       FontSize="11"
+                       Foreground="{StaticResource SecondaryTextBrush}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasSubTh1ngs}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <StackPanel Margin="0,20,0,0"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">

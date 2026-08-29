@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace nineth1ngs.Models;
@@ -27,9 +28,18 @@ public partial class Th1ng : ObservableObject
     [ObservableProperty]
     private DateTime? timerStartedAt;
 
+    [ObservableProperty]
+    private int? parentId;
+
     private bool isEditing;
 
     private string editText = string.Empty;
+
+    private bool isExpanded;
+
+    private bool isAddingSubTh1ng;
+
+    private string newSubTh1ngText = string.Empty;
 
     [NotMapped]
     public bool IsEditing
@@ -46,7 +56,34 @@ public partial class Th1ng : ObservableObject
     }
 
     [NotMapped]
+    public bool IsExpanded
+    {
+        get => isExpanded;
+        set => SetProperty(ref isExpanded, value);
+    }
+
+    [NotMapped]
+    public bool IsAddingSubTh1ng
+    {
+        get => isAddingSubTh1ng;
+        set => SetProperty(ref isAddingSubTh1ng, value);
+    }
+
+    [NotMapped]
+    public string NewSubTh1ngText
+    {
+        get => newSubTh1ngText;
+        set => SetProperty(ref newSubTh1ngText, value);
+    }
+
+    [NotMapped]
+    public ObservableCollection<Th1ng> SubTh1ngs { get; } = [];
+
+    [NotMapped]
     public bool IsTimerRunning => TimerStartedAt.HasValue;
+
+    [NotMapped]
+    public bool IsSubTh1ng => ParentId.HasValue;
 
     [NotMapped]
     public string ElapsedTimeText => FormatElapsedTime(GetElapsedSeconds());

@@ -57,8 +57,26 @@ public partial class MainViewModel : ObservableObject
             OpenTh1ngs.Clear();
             DoneTh1ngs.Clear();
 
-            foreach (var th1ng in th1ngs)
+            var topLevelTh1ngs = th1ngs
+                .Where(th1ng => !th1ng.ParentId.HasValue)
+                .OrderByDescending(th1ng => th1ng.CreatedAt)
+                .ToList();
+            var topLevelIds = topLevelTh1ngs.Select(th1ng => th1ng.Id).ToHashSet();
+            var subTh1ngsByParent = th1ngs
+                .Where(th1ng => th1ng.ParentId.HasValue && topLevelIds.Contains(th1ng.ParentId.Value))
+                .GroupBy(th1ng => th1ng.ParentId!.Value)
+                .ToDictionary(group => group.Key, group => group.OrderByDescending(th1ng => th1ng.CreatedAt).ToList());
+
+            foreach (var th1ng in topLevelTh1ngs)
             {
+                if (subTh1ngsByParent.TryGetValue(th1ng.Id, out var subTh1ngs))
+                {
+                    foreach (var subTh1ng in subTh1ngs)
+                    {
+                        th1ng.SubTh1ngs.Add(subTh1ng);
+                    }
+                }
+
                 AddToSection(th1ng);
             }
         }
@@ -96,6 +114,41 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task AddSubTh1ngAsync(Th1ng parent)
+    {
+        if (parent.ParentId.HasValue)
+        {
+            return;
+        }
+
+        var text = parent.NewSubTh1ngText.Trim();
+        if (text.Length == 0)
+        {
+            return;
+        }
+
+        var subTh1ng = new Th1ng
+        {
+            Text = text,
+            CreatedAt = DateTime.UtcNow,
+            ParentId = parent.Id
+        };
+
+        try
+        {
+            await store.AddAsync(subTh1ng);
+            parent.SubTh1ngs.Insert(0, subTh1ng);
+            parent.NewSubTh1ngText = string.Empty;
+            parent.IsAddingSubTh1ng = false;
+            parent.IsExpanded = true;
+        }
+        catch (Exception exception)
+        {
+            ReportError("The sub-th1ng could not be saved.", exception);
+        }
+    }
+
+    [RelayCommand]
     private async Task ToggleCompletionAsync(Th1ng th1ng)
     {
         var previousIsCompleted = th1ng.IsCompleted;
@@ -107,7 +160,10 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.UpdateAsync(th1ng);
-            RefreshSections(th1ng);
+            if (!th1ng.ParentId.HasValue)
+            {
+                RefreshSections(th1ng);
+            }
         }
         catch
         {
@@ -120,6 +176,11 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task ToggleTimerAsync(Th1ng th1ng)
     {
+        if (th1ng.ParentId.HasValue)
+        {
+            return;
+        }
+
         if (th1ng.IsTimerRunning)
         {
             _ = await PauseTimerAsync(th1ng);
@@ -160,8 +221,15 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.DeleteAsync(th1ng);
-            OpenTh1ngs.Remove(th1ng);
-            DoneTh1ngs.Remove(th1ng);
+            if (th1ng.ParentId.HasValue)
+            {
+                FindParent(th1ng)?.SubTh1ngs.Remove(th1ng);
+            }
+            else
+            {
+                OpenTh1ngs.Remove(th1ng);
+                DoneTh1ngs.Remove(th1ng);
+            }
         }
         catch (Exception exception)
         {
@@ -174,6 +242,23 @@ public partial class MainViewModel : ObservableObject
     {
         th1ng.EditText = th1ng.Text;
         th1ng.IsEditing = true;
+    }
+
+    [RelayCommand]
+    private static void BeginAddSubTh1ng(Th1ng parent)
+    {
+        if (!parent.ParentId.HasValue)
+        {
+            parent.IsExpanded = true;
+            parent.IsAddingSubTh1ng = true;
+        }
+    }
+
+    [RelayCommand]
+    private static void CancelAddSubTh1ng(Th1ng parent)
+    {
+        parent.NewSubTh1ngText = string.Empty;
+        parent.IsAddingSubTh1ng = false;
     }
 
     [RelayCommand]
@@ -262,4 +347,7 @@ public partial class MainViewModel : ObservableObject
             }
         }
     }
+
+    private Th1ng? FindParent(Th1ng subTh1ng) =>
+        OpenTh1ngs.Concat(DoneTh1ngs).FirstOrDefault(parent => parent.SubTh1ngs.Contains(subTh1ng));
 }

@@ -2,8 +2,10 @@
 using nineth1ngs.ViewModels;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace nineth1ngs;
 
@@ -53,7 +55,7 @@ public partial class MainWindow : Window
 
     private Task<bool> ConfirmDeleteAsync(Models.Th1ng th1ng)
     {
-        var dialog = new Views.DeleteConfirmationWindow(th1ng.Text)
+        var dialog = new Views.DeleteConfirmationWindow(th1ng.Text, th1ng.SubTh1ngs.Count)
         {
             Owner = this
         };
@@ -101,6 +103,19 @@ public partial class MainWindow : Window
         DragMove();
     }
 
+    private void Th1ngRowMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount != 1 || IsInteractiveElement(e.OriginalSource as DependencyObject))
+        {
+            return;
+        }
+
+        if (sender is Border { DataContext: Models.Th1ng th1ng })
+        {
+            th1ng.IsExpanded = !th1ng.IsExpanded;
+        }
+    }
+
     private void MinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void MaximizeClick(object sender, RoutedEventArgs e) => ToggleMaximize();
@@ -112,6 +127,21 @@ public partial class MainWindow : Window
         WindowState = WindowState == WindowState.Maximized
             ? WindowState.Normal
             : WindowState.Maximized;
+    }
+
+    private static bool IsInteractiveElement(DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is Button or TextBox)
+            {
+                return true;
+            }
+
+            source = VisualTreeHelper.GetParent(source);
+        }
+
+        return false;
     }
 
     private static void ShowError(string message)

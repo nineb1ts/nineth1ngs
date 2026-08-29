@@ -8,6 +8,11 @@ public sealed class Th1ngDbContext : DbContext
 {
     public DbSet<Th1ng> Th1ngs => Set<Th1ng>();
 
+    public Th1ngDbContext(DbContextOptions<Th1ngDbContext>? options = null)
+        : base(options ?? new DbContextOptions<Th1ngDbContext>())
+    {
+    }
+
     public static string DatabaseDirectory => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "nineth1ngs");
@@ -16,6 +21,11 @@ public sealed class Th1ngDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        if (optionsBuilder.IsConfigured)
+        {
+            return;
+        }
+
         Directory.CreateDirectory(DatabaseDirectory);
         optionsBuilder.UseSqlite($"Data Source={DatabasePath}");
     }
@@ -27,6 +37,10 @@ public sealed class Th1ngDbContext : DbContext
             entity.HasKey(th1ng => th1ng.Id);
             entity.Property(th1ng => th1ng.Text).IsRequired();
             entity.Property(th1ng => th1ng.CreatedAt).IsRequired();
+            entity.HasOne<Th1ng>()
+                .WithMany()
+                .HasForeignKey(th1ng => th1ng.ParentId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
