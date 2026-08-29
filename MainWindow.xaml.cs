@@ -6,6 +6,8 @@ using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Input;
 using System.Windows.Media;
+using nineth1ngs.Models;
+using System.Linq;
 
 namespace nineth1ngs;
 
@@ -151,6 +153,45 @@ public partial class MainWindow : Window
             "nineth1ngs",
             MessageBoxButton.OK,
             MessageBoxImage.Error);
+    }
+
+    private void WindowPreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel)
+            return;
+
+        // Klick innerhalb eines aktuell bearbeiteten TextBox -> nichts tun
+        if (e.OriginalSource is DependencyObject clickedElement)
+        {
+            var current = clickedElement;
+
+            while (current is not null)
+            {
+                if (current is TextBox textBox &&
+                    textBox.DataContext is Th1ng clickedTh1ng &&
+                    clickedTh1ng.IsEditing)
+                {
+                    return;
+                }
+
+                current = VisualTreeHelper.GetParent(current);
+            }
+        }
+
+        var editingTh1ng = viewModel.OpenTh1ngs
+            .FirstOrDefault(th1ng => th1ng.IsEditing);
+
+        editingTh1ng ??= viewModel.OpenTh1ngs
+            .SelectMany(th1ng => th1ng.SubTh1ngs)
+            .FirstOrDefault(sub => sub.IsEditing);
+
+        if (editingTh1ng is null)
+            return;
+
+        if (viewModel.SaveEditingCommand.CanExecute(editingTh1ng))
+        {
+            viewModel.SaveEditingCommand.Execute(editingTh1ng);
+        }
     }
 
     private const int DwmWindowCornerPreferenceAttribute = 33;

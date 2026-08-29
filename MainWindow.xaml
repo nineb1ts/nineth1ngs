@@ -19,228 +19,359 @@
         WindowStartupLocation="CenterScreen"
         Topmost="True"
         UseLayoutRounding="True"
-        SnapsToDevicePixels="True">
+        SnapsToDevicePixels="True"
+        PreviewMouseDown="WindowPreviewMouseDown">
+
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="0"
                             ResizeBorderThickness="6"
                             GlassFrameThickness="0"
-                            CornerRadius="0" />
+                            CornerRadius="0"/>
     </shell:WindowChrome.WindowChrome>
+
     <Window.Resources>
-        <services:TimestampDisplayConverter x:Key="TimestampConverter" />
+
+        <services:TimestampDisplayConverter x:Key="TimestampConverter"/>
+
         <Style x:Key="OpenSectionButtonStyle"
                BasedOn="{StaticResource SectionButtonStyle}"
                TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}" />
+            <Setter Property="Background"
+                    Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource PrimaryTextBrush}"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding SelectedSection}" Value="done">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}" />
+                <DataTrigger Binding="{Binding SelectedSection}"
+                             Value="done">
+                    <Setter Property="Background"
+                            Value="Transparent"/>
+                    <Setter Property="Foreground"
+                            Value="{StaticResource SecondaryTextBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
         <Style x:Key="DoneSectionButtonStyle"
                BasedOn="{StaticResource SectionButtonStyle}"
                TargetType="Button">
+
             <Style.Triggers>
-                <DataTrigger Binding="{Binding SelectedSection}" Value="done">
-                    <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-                    <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}" />
+                <DataTrigger Binding="{Binding SelectedSection}"
+                             Value="done">
+                    <Setter Property="Background"
+                            Value="{StaticResource SurfaceBrush}"/>
+                    <Setter Property="Foreground"
+                            Value="{StaticResource PrimaryTextBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="OpenSectionVisibilityStyle" TargetType="Grid">
-            <Setter Property="Visibility" Value="Visible" />
+
+        <Style x:Key="OpenSectionVisibilityStyle"
+               TargetType="Grid">
+            <Setter Property="Visibility"
+                    Value="Visible"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding SelectedSection}" Value="done">
-                    <Setter Property="Visibility" Value="Collapsed" />
+                <DataTrigger Binding="{Binding SelectedSection}"
+                             Value="done">
+                    <Setter Property="Visibility"
+                            Value="Collapsed"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="DoneSectionVisibilityStyle" TargetType="Grid">
-            <Setter Property="Visibility" Value="Collapsed" />
+
+        <Style x:Key="DoneSectionVisibilityStyle"
+               TargetType="Grid">
+            <Setter Property="Visibility"
+                    Value="Collapsed"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding SelectedSection}" Value="done">
-                    <Setter Property="Visibility" Value="Visible" />
+                <DataTrigger Binding="{Binding SelectedSection}"
+                             Value="done">
+                    <Setter Property="Visibility"
+                            Value="Visible"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+
+        <!-- ========================================================= -->
+        <!-- SUB-TH1NG                                                 -->
+        <!-- ========================================================= -->
+
         <DataTemplate x:Key="SubTh1ngTemplate">
-            <Border Margin="18,0,0,0"
-                    Padding="8,5"
-                    Style="{StaticResource Th1ngItemStyle}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0" MinWidth="0">
-                        <TextBlock Text="{Binding Text}"
-                                   Style="{StaticResource Th1ngTextStyle}">
-                            <TextBlock.InputBindings>
-                                <MouseBinding MouseAction="LeftDoubleClick"
-                                              Command="{Binding DataContext.BeginEditingCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              CommandParameter="{Binding}" />
-                            </TextBlock.InputBindings>
-                        </TextBlock>
-                        <TextBox Text="{Binding EditText, UpdateSourceTrigger=PropertyChanged}"
-                                 TextWrapping="Wrap">
-                            <TextBox.Style>
-                                <Style BasedOn="{StaticResource InlineEditTextBoxStyle}" TargetType="TextBox">
-                                    <Setter Property="Visibility" Value="Collapsed" />
+            <Grid Margin="24,2,0,2"
+                  MinHeight="27">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Text -->
+
+                <Grid Grid.Column="0"
+                      MinWidth="0">
+                    <TextBlock Text="{Binding Text}"
+                               VerticalAlignment="Center"
+                               FontFamily="Segoe UI Variable Small"
+                               FontSize="13"
+                               Foreground="{StaticResource SecondaryTextBrush}"
+                               TextTrimming="CharacterEllipsis">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextDecorations"
+                                        Value="{x:Null}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsCompleted}"
+                                                 Value="True">
+                                        <Setter Property="Opacity"
+                                                Value="0.55"/>
+                                        <Setter Property="TextDecorations"
+                                                Value="Strikethrough"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsEditing}"
+                                                 Value="True">
+                                        <Setter Property="Visibility"
+                                                Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+
+                        <TextBlock.InputBindings>
+                            <MouseBinding MouseAction="LeftDoubleClick"
+                                          Command="{Binding DataContext.BeginEditingCommand,
+                                                            RelativeSource={RelativeSource AncestorType=Window}}"
+                                          CommandParameter="{Binding}"/>
+                        </TextBlock.InputBindings>
+                    </TextBlock>
+
+
+                    <!-- Inline edit -->
+
+                    <TextBox Text="{Binding EditText,
+                        UpdateSourceTrigger=PropertyChanged}"
+                             TextWrapping="Wrap"
+                             FontSize="13">
+                        <TextBox.Style>
+                            <Style BasedOn="{StaticResource InlineEditTextBoxStyle}"
+                                   TargetType="TextBox">
+                                <Setter Property="Visibility"
+                                        Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEditing}"
+                                                 Value="True">
+                                        <Setter Property="Visibility"
+                                                Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter"
+                                        Command="{Binding DataContext.SaveEditingCommand,
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"/>
+                            <KeyBinding Key="Escape"
+                                        Command="{Binding DataContext.CancelEditingCommand,
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                </Grid>
+
+
+                <!-- Complete -->
+
+                <Button Grid.Column="2"
+                        Style="{StaticResource CompletionIconButtonStyle}"
+                        Command="{Binding DataContext.ToggleCompletionCommand,
+                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding}"
+                        ToolTip="Complete or reopen sub-th1ng">
+                    <Grid Width="15"
+                          Height="15">
+                        <Path Data="{StaticResource CheckGeometry}"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                               Path=Foreground}"
+                              StrokeThickness="1.6"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round">
+                            <Path.Style>
+                                <Style TargetType="Path">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible" />
+                                        <DataTrigger Binding="{Binding IsCompleted}"
+                                                     Value="True">
+                                            <Setter Property="Visibility"
+                                                    Value="Collapsed"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </TextBox.Style>
-                            <TextBox.InputBindings>
-                                <KeyBinding Key="Enter"
-                                            Command="{Binding DataContext.SaveEditingCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}" />
-                                <KeyBinding Key="Escape"
-                                            Command="{Binding DataContext.CancelEditingCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}" />
-                            </TextBox.InputBindings>
-                        </TextBox>
+                            </Path.Style>
+                        </Path>
+
+
+                        <Path Data="{StaticResource ReopenArrowGeometry}"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                               Path=Foreground}"
+                              StrokeThickness="1.4"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCompleted}"
+                                                     Value="True">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
                     </Grid>
-                    <StackPanel Grid.Column="1"
-                                Margin="8,0,0,0"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center">
-                        <Button Style="{StaticResource CompletionIconButtonStyle}"
-                                Command="{Binding DataContext.ToggleCompletionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="{Binding}"
-                                ToolTip="Complete or reopen sub-th1ng">
-                            <Grid Width="15" Height="15">
-                                <Path Data="{StaticResource CheckGeometry}"
-                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                      StrokeThickness="1.8"
-                                      StrokeStartLineCap="Round"
-                                      StrokeEndLineCap="Round"
-                                      StrokeLineJoin="Round">
-                                    <Path.Style>
-                                        <Style TargetType="Path">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Path.Style>
-                                </Path>
-                                <Path Data="{StaticResource ReopenArrowGeometry}"
-                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                      StrokeThickness="1.5"
-                                      StrokeStartLineCap="Round"
-                                      StrokeEndLineCap="Round"
-                                      StrokeLineJoin="Round">
-                                    <Path.Style>
-                                        <Style TargetType="Path">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Path.Style>
-                                </Path>
-                            </Grid>
-                        </Button>
-                        <Button Style="{StaticResource DangerIconButtonStyle}"
-                                Command="{Binding DataContext.DeleteTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="{Binding}"
-                                ToolTip="Delete sub-th1ng">
-                            <Path Data="{StaticResource CloseGeometry}"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.4"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round" />
-                        </Button>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                </Button>
+            </Grid>
         </DataTemplate>
+
+
+        <!-- ========================================================= -->
+        <!-- TH1NG                                                     -->
+        <!-- ========================================================= -->
+
         <DataTemplate x:Key="Th1ngTemplate">
             <StackPanel>
+
+
+                <!-- Parent -->
+
                 <Border Margin="0"
                         Padding="11,8"
                         Style="{StaticResource Th1ngItemStyle}"
+                        BorderThickness="0"
                         MouseLeftButtonUp="Th1ngRowMouseLeftButtonUp">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" MinWidth="0">
-                            <TextBlock Text="{Binding CreatedAt, Converter={StaticResource TimestampConverter}}"
-                                       Style="{StaticResource TimestampStyle}" />
+
+
+                        <!-- Content -->
+
+                        <StackPanel Grid.Column="0"
+                                    MinWidth="0">
+
+
+                            <!-- Datum -->
+
+                            <TextBlock Text="{Binding CreatedAt,
+                                                     Converter={StaticResource TimestampConverter}}"
+                                       Style="{StaticResource TimestampStyle}"/>
+
+
+                            <!-- Titel -->
+
                             <TextBlock Text="{Binding Text}"
                                        Style="{StaticResource Th1ngTextStyle}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding MouseAction="LeftDoubleClick"
-                                                  Command="{Binding DataContext.BeginEditingCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                  CommandParameter="{Binding}" />
+                                                  Command="{Binding DataContext.BeginEditingCommand,
+                                                                    RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  CommandParameter="{Binding}"/>
                                 </TextBlock.InputBindings>
                             </TextBlock>
-                            <TextBox Text="{Binding EditText, UpdateSourceTrigger=PropertyChanged}"
+
+
+                            <!-- Edit -->
+
+                            <TextBox Text="{Binding EditText,
+                                                   UpdateSourceTrigger=PropertyChanged}"
                                      TextWrapping="Wrap">
                                 <TextBox.Style>
-                                    <Style BasedOn="{StaticResource InlineEditTextBoxStyle}" TargetType="TextBox">
-                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style BasedOn="{StaticResource InlineEditTextBoxStyle}"
+                                           TargetType="TextBox">
+                                        <Setter Property="Visibility"
+                                                Value="Collapsed"/>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsEditing}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible" />
+                                            <DataTrigger Binding="{Binding IsEditing}"
+                                                         Value="True">
+                                                <Setter Property="Visibility"
+                                                        Value="Visible"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </TextBox.Style>
+
                                 <TextBox.InputBindings>
                                     <KeyBinding Key="Enter"
-                                                Command="{Binding DataContext.SaveEditingCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}" />
+                                                Command="{Binding DataContext.SaveEditingCommand,
+                                                                  RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"/>
                                     <KeyBinding Key="Escape"
-                                                Command="{Binding DataContext.CancelEditingCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}" />
+                                                Command="{Binding DataContext.CancelEditingCommand,
+                                                                  RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"/>
                                 </TextBox.InputBindings>
                             </TextBox>
+
+
+                            <!-- Timer -->
+
                             <StackPanel Orientation="Horizontal"
                                         VerticalAlignment="Center"
                                         Margin="-5,2,0,0">
                                 <Button Style="{StaticResource CompletionIconButtonStyle}"
-                                        Command="{Binding DataContext.ToggleTimerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Command="{Binding DataContext.ToggleTimerCommand,
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"
                                         ToolTip="Start or pause timer">
-                                    <Grid Width="15" Height="15">
+                                    <Grid Width="15"
+                                          Height="15">
+
+
+                                        <!-- Play -->
+
                                         <Path Data="{StaticResource PlayGeometry}"
-                                              Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                              Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                                             Path=Foreground}"
+                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                                               Path=Foreground}"
                                               StrokeThickness="1">
                                             <Path.Style>
                                                 <Style TargetType="Path">
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsTimerRunning}" Value="True">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        <DataTrigger Binding="{Binding IsTimerRunning}"
+                                                                     Value="True">
+                                                            <Setter Property="Visibility"
+                                                                    Value="Collapsed"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Path.Style>
                                         </Path>
+
+
+                                        <!-- Pause -->
+
                                         <Path Data="{StaticResource PauseGeometry}"
-                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                                               Path=Foreground}"
                                               StrokeThickness="1.8"
                                               StrokeStartLineCap="Round"
                                               StrokeEndLineCap="Round">
                                             <Path.Style>
                                                 <Style TargetType="Path">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Setter Property="Visibility"
+                                                            Value="Collapsed"/>
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsTimerRunning}" Value="True">
-                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        <DataTrigger Binding="{Binding IsTimerRunning}"
+                                                                     Value="True">
+                                                            <Setter Property="Visibility"
+                                                                    Value="Visible"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -248,25 +379,39 @@
                                         </Path>
                                     </Grid>
                                 </Button>
+
+
                                 <TextBlock Text="{Binding ElapsedTimeText}"
                                            VerticalAlignment="Center"
                                            FontFamily="Segoe UI Variable Small"
                                            FontSize="12"
                                            FontWeight="SemiBold"
-                                           Foreground="{StaticResource AccentBrush}" />
+                                           Foreground="{StaticResource AccentBrush}"/>
                             </StackPanel>
                         </StackPanel>
+
+
+                        <!-- Parent actions -->
+
                         <StackPanel Grid.Column="1"
                                     Margin="8,0,0,0"
                                     Orientation="Horizontal"
                                     VerticalAlignment="Center">
+
+
+                            <!-- Complete -->
+
                             <Button Style="{StaticResource CompletionIconButtonStyle}"
-                                    Command="{Binding DataContext.ToggleCompletionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Command="{Binding DataContext.ToggleCompletionCommand,
+                                                      RelativeSource={RelativeSource AncestorType=Window}}"
                                     CommandParameter="{Binding}"
                                     ToolTip="Complete or reopen th1ng">
-                                <Grid Width="15" Height="15">
+                                <Grid Width="15"
+                                      Height="15">
+
                                     <Path Data="{StaticResource CheckGeometry}"
-                                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                                           Path=Foreground}"
                                           StrokeThickness="1.8"
                                           StrokeStartLineCap="Round"
                                           StrokeEndLineCap="Round"
@@ -274,25 +419,33 @@
                                         <Path.Style>
                                             <Style TargetType="Path">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    <DataTrigger Binding="{Binding IsCompleted}"
+                                                                 Value="True">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Path.Style>
                                     </Path>
+
+
                                     <Path Data="{StaticResource ReopenArrowGeometry}"
-                                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                                           Path=Foreground}"
                                           StrokeThickness="1.5"
                                           StrokeStartLineCap="Round"
                                           StrokeEndLineCap="Round"
                                           StrokeLineJoin="Round">
                                         <Path.Style>
                                             <Style TargetType="Path">
-                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Setter Property="Visibility"
+                                                        Value="Collapsed"/>
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    <DataTrigger Binding="{Binding IsCompleted}"
+                                                                 Value="True">
+                                                        <Setter Property="Visibility"
+                                                                Value="Visible"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -300,313 +453,423 @@
                                     </Path>
                                 </Grid>
                             </Button>
+
+
+                            <!-- Delete -->
+
                             <Button Style="{StaticResource DangerIconButtonStyle}"
-                                    Command="{Binding DataContext.DeleteTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Command="{Binding DataContext.DeleteTh1ngCommand,
+                                                      RelativeSource={RelativeSource AncestorType=Window}}"
                                     CommandParameter="{Binding}"
                                     ToolTip="Delete th1ng">
                                 <Path Data="{StaticResource CloseGeometry}"
-                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                                       Path=Foreground}"
                                       StrokeThickness="1.4"
                                       StrokeStartLineCap="Round"
                                       StrokeEndLineCap="Round"
-                                      StrokeLineJoin="Round" />
+                                      StrokeLineJoin="Round"/>
                             </Button>
                         </StackPanel>
                     </Grid>
                 </Border>
+
+
+                <!-- ================================================= -->
+                <!-- EXPANDED CONTENT                                  -->
+                <!-- ================================================= -->
+
                 <StackPanel Margin="0">
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
-                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Setter Property="Visibility"
+                                    Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible" />
+                                <DataTrigger Binding="{Binding IsExpanded}"
+                                             Value="True">
+                                    <Setter Property="Visibility"
+                                            Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
+
+
+                    <!-- Sub-th1ngs -->
+
                     <ItemsControl ItemsSource="{Binding SubTh1ngs}"
-                                  ItemTemplate="{StaticResource SubTh1ngTemplate}" />
-                    <Button Command="{Binding DataContext.BeginAddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                  ItemTemplate="{StaticResource SubTh1ngTemplate}"/>
+
+
+                    <!-- Add sub-th1ng -->
+
+                    <Button Command="{Binding DataContext.BeginAddSubTh1ngCommand,
+                                              RelativeSource={RelativeSource AncestorType=Window}}"
                             CommandParameter="{Binding}"
                             HorizontalAlignment="Left"
-                            Margin="18,2,0,2"
+                            Margin="24,3,0,3"
                             Padding="8,4"
                             Background="Transparent"
                             BorderBrush="Transparent"
                             BorderThickness="0"
                             Foreground="{StaticResource SecondaryTextBrush}"
                             FontFamily="Segoe UI Variable Small"
-                            FontSize="11"
+                            FontSize="12"
                             Cursor="Hand"
                             ToolTip="Add sub-th1ng">
-                        <TextBlock Text="+ Add sub-th1ng..." />
+                        <TextBlock Text="+ Add sub-th1ng..."/>
                         <Button.Style>
                             <Style TargetType="Button">
-                                <Setter Property="Visibility" Value="Visible" />
+                                <Setter Property="Visibility"
+                                        Value="Visible"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsAddingSubTh1ng}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    <DataTrigger Binding="{Binding IsAddingSubTh1ng}"
+                                                 Value="True">
+                                        <Setter Property="Visibility"
+                                                Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Grid Margin="18,2,0,6">
+
+
+                    <!-- Input -->
+
+                    <Grid Margin="24,3,0,7">
                         <Grid.Style>
                             <Style TargetType="Grid">
-                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Setter Property="Visibility"
+                                        Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsAddingSubTh1ng}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
+                                    <DataTrigger Binding="{Binding IsAddingSubTh1ng}"
+                                                 Value="True">
+                                        <Setter Property="Visibility"
+                                                Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
+
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+
+
                         <TextBox Grid.Column="0"
-                                 Text="{Binding NewSubTh1ngText, UpdateSourceTrigger=PropertyChanged}"
+                                 Text="{Binding NewSubTh1ngText,
+                                                UpdateSourceTrigger=PropertyChanged}"
                                  VerticalContentAlignment="Center"
                                  Background="{StaticResource SurfaceBrush}"
                                  BorderBrush="{StaticResource BorderBrush}"
                                  BorderThickness="1"
                                  Foreground="{StaticResource PrimaryTextBrush}"
                                  FontFamily="Segoe UI Variable Small"
-                                 FontSize="12"
+                                 FontSize="13"
                                  Padding="7,4"
                                  CaretBrush="{StaticResource AccentBrush}"
                                  ToolTip="Write a sub-th1ng">
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Enter"
-                                            Command="{Binding DataContext.AddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}" />
+                                            Command="{Binding DataContext.AddSubTh1ngCommand,
+                                                              RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"/>
                                 <KeyBinding Key="Escape"
-                                            Command="{Binding DataContext.CancelAddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}" />
+                                            Command="{Binding DataContext.CancelAddSubTh1ngCommand,
+                                                              RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"/>
                             </TextBox.InputBindings>
                         </TextBox>
+
+
                         <Button Grid.Column="1"
-                                Command="{Binding DataContext.AddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                Command="{Binding DataContext.AddSubTh1ngCommand,
+                                                  RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 Style="{StaticResource AddButtonStyle}"
                                 ToolTip="Add sub-th1ng">
                             <Path Data="{StaticResource AddGeometry}"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                                   Path=Foreground}"
                                   StrokeThickness="1.7"
                                   StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round" />
+                                  StrokeEndLineCap="Round"/>
                         </Button>
                     </Grid>
                 </StackPanel>
+
+
+                <!-- ================================================= -->
+                <!-- SEPARATOR                                         -->
+                <!-- Erst NACH Parent + Sub-th1ngs                     -->
+                <!-- ================================================= -->
+
+                <Border Height="1"
+                        Margin="0,6,0,4"
+                        Background="{StaticResource BorderBrush}"/>
             </StackPanel>
         </DataTemplate>
     </Window.Resources>
-        <Border Background="{StaticResource WindowBackgroundBrush}"
+
+
+    <!-- ============================================================= -->
+    <!-- WINDOW                                                        -->
+    <!-- ============================================================= -->
+
+    <Border Background="{StaticResource WindowBackgroundBrush}"
             BorderBrush="{StaticResource BorderBrush}"
             BorderThickness="1"
             CornerRadius="0">
         <Grid Background="{StaticResource WindowBackgroundBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="42" />
-            <RowDefinition Height="38" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="64" />
-        </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="42"/>
+                <RowDefinition Height="38"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="64"/>
+            </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0"
-              Background="{StaticResource ChromeBrush}"
-              MouseLeftButtonDown="TitleBarMouseLeftButtonDown"
-              shell:WindowChrome.IsHitTestVisibleInChrome="True">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0"
-                        Margin="16,0,0,0"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
-                <svgc:SvgViewbox Width="25"
-                         Height="25"
-                         Stretch="Uniform"
-                         Source="logo.svg"
-                         ToolTip="nineth1ngs logo" />
-                <TextBlock Margin="8,0,0,1"
-                           Text="nineth1ngs"
-                           FontFamily="Segoe UI Variable Small"
-                           FontSize="12"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource PrimaryTextBrush}"
-                           VerticalAlignment="Center" />
-            </StackPanel>
-            <StackPanel Grid.Column="1"
-                        Margin="0,6,8,6"
-                        Orientation="Horizontal"
-                        shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                <Button Click="MinimizeClick"
-                        Style="{StaticResource WindowButtonStyle}"
-                        ToolTip="Minimize">
-                    <Path Data="{StaticResource MinimizeGeometry}"
-                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                          StrokeThickness="1.4"
-                          StrokeStartLineCap="Round" />
-                </Button>
-                <Button Click="MaximizeClick"
-                        Style="{StaticResource WindowButtonStyle}"
-                        ToolTip="Maximize or restore">
-                    <Path Data="{StaticResource MaximizeGeometry}"
-                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                          StrokeThickness="1.2" />
-                </Button>
-                <Button Click="CloseClick"
-                        Style="{StaticResource WindowButtonStyle}"
-                        ToolTip="Close">
-                    <Path Data="{StaticResource CloseGeometry}"
-                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                          StrokeThickness="1.4"
-                          StrokeStartLineCap="Round"
-                          StrokeEndLineCap="Round" />
-                </Button>
-            </StackPanel>
-        </Grid>
 
-        <Grid Grid.Row="1" Margin="18,0">
-            <StackPanel
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center">
-                <Button Command="{Binding ShowOpenCommand}"
-                        Style="{StaticResource OpenSectionButtonStyle}"
-                        ToolTip="Show open th1ngs">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="TH1NGS" />
-                        <TextBlock Text="  ·  " Foreground="{StaticResource MutedTextBrush}" />
-                        <TextBlock Text="{Binding OpenTh1ngs.Count}" />
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding ShowDoneCommand}"
-                        Style="{StaticResource DoneSectionButtonStyle}"
-                        ToolTip="Show completed th1ngs">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="DONE" />
-                        <TextBlock Text="  ·  " Foreground="{StaticResource MutedTextBrush}" />
-                        <TextBlock Text="{Binding DoneTh1ngs.Count}" />
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
+            <!-- ===================================================== -->
+            <!-- TITLE BAR                                             -->
+            <!-- ===================================================== -->
 
-        <ScrollViewer Grid.Row="2"
-                      Padding="18,0,18,8"
-                      VerticalScrollBarVisibility="Hidden"
-                      HorizontalScrollBarVisibility="Disabled"
-                      CanContentScroll="True">
-            <Grid>
-                <Grid Style="{StaticResource OpenSectionVisibilityStyle}">
-                    <TextBlock Text="Nothing is waiting."
-                               Margin="0,28"
-                               HorizontalAlignment="Center"
+            <Grid Grid.Row="0"
+                  Background="{StaticResource ChromeBrush}"
+                  MouseLeftButtonDown="TitleBarMouseLeftButtonDown"
+                  shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0"
+                            Margin="16,0,0,0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <svgc:SvgViewbox Width="25"
+                                     Height="25"
+                                     Stretch="Uniform"
+                                     Source="logo.svg"
+                                     ToolTip="nineth1ngs logo"/>
+                    <TextBlock Margin="8,0,0,1"
+                               Text="nineth1ngs"
                                FontFamily="Segoe UI Variable Small"
                                FontSize="12"
-                               Foreground="{StaticResource MutedTextBrush}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding OpenTh1ngs.Count}" Value="0">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <ItemsControl ItemsSource="{Binding OpenTh1ngs}"
-                                  ItemTemplate="{StaticResource Th1ngTemplate}" />
-                </Grid>
-                <Grid Style="{StaticResource DoneSectionVisibilityStyle}">
-                    <TextBlock Text="Nothing done yet."
-                               Margin="0,28"
-                               HorizontalAlignment="Center"
-                               FontFamily="Segoe UI Variable Small"
-                               FontSize="12"
-                               Foreground="{StaticResource MutedTextBrush}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DoneTh1ngs.Count}" Value="0">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <ItemsControl ItemsSource="{Binding DoneTh1ngs}"
-                                  ItemTemplate="{StaticResource Th1ngTemplate}" />
-                </Grid>
-            </Grid>
-        </ScrollViewer>
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource PrimaryTextBrush}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1"
+                            Margin="0,6,8,6"
+                            Orientation="Horizontal"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True">
 
-        <Border Grid.Row="3"
-            Margin="18,6,18,10"
-            Padding="10,4,6,4"
-                Background="{StaticResource SurfaceBrush}"
-                BorderBrush="{StaticResource BorderBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-            <Grid MinHeight="34">
-                <TextBlock Text="Add a new th1ng..."
-                           Margin="3,0,0,0"
-                           VerticalAlignment="Center"
-                           FontFamily="Segoe UI Variable Small"
-                           FontSize="13"
-                           Foreground="{StaticResource MutedTextBrush}"
-                           IsHitTestVisible="False">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding NewTh1ngText}" Value="">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0"
-                             Text="{Binding NewTh1ngText, UpdateSourceTrigger=PropertyChanged}"
-                             VerticalContentAlignment="Center"
-                             Background="Transparent"
-                             BorderThickness="0"
-                             Foreground="{StaticResource PrimaryTextBrush}"
-                             FontFamily="Segoe UI Variable Small"
-                             FontSize="13"
-                             CaretBrush="{StaticResource AccentBrush}"
-                             ToolTip="Write a new th1ng">
-                        <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding AddTh1ngCommand}" />
-                        </TextBox.InputBindings>
-                    </TextBox>
-                    <Button Grid.Column="1"
-                            Command="{Binding AddTh1ngCommand}"
-                            Style="{StaticResource AddButtonStyle}"
-                            ToolTip="Add th1ng">
-                        <Path Data="{StaticResource AddGeometry}"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                              StrokeThickness="1.7"
-                              StrokeStartLineCap="Round"
-                              StrokeEndLineCap="Round" />
+                    <Button Click="MinimizeClick"
+                            Style="{StaticResource WindowButtonStyle}"
+                            ToolTip="Minimize">
+                        <Path Data="{StaticResource MinimizeGeometry}"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                               Path=Foreground}"
+                              StrokeThickness="1.4"
+                              StrokeStartLineCap="Round"/>
                     </Button>
-                </Grid>
+                    <Button Click="MaximizeClick"
+                            Style="{StaticResource WindowButtonStyle}"
+                            ToolTip="Maximize or restore">
+                        <Path Data="{StaticResource MaximizeGeometry}"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                               Path=Foreground}"
+                              StrokeThickness="1.2"/>
+                    </Button>
+                    <Button Click="CloseClick"
+                            Style="{StaticResource WindowButtonStyle}"
+                            ToolTip="Close">
+                        <Path Data="{StaticResource CloseGeometry}"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                               Path=Foreground}"
+                              StrokeThickness="1.4"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"/>
+                    </Button>
+                </StackPanel>
             </Grid>
-        </Border>
-    </Grid>
+
+
+            <!-- ===================================================== -->
+            <!-- SECTION NAVIGATION                                    -->
+            <!-- ===================================================== -->
+
+            <Grid Grid.Row="1"
+                  Margin="18,0">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <Button Command="{Binding ShowOpenCommand}"
+                            Style="{StaticResource OpenSectionButtonStyle}"
+                            ToolTip="Show open th1ngs">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="TH1NGS"/>
+                            <TextBlock Text="  ·  "
+                                       Foreground="{StaticResource MutedTextBrush}"/>
+                            <TextBlock Text="{Binding OpenTh1ngs.Count}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding ShowDoneCommand}"
+                            Style="{StaticResource DoneSectionButtonStyle}"
+                            ToolTip="Show completed th1ngs">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="DONE"/>
+                            <TextBlock Text="  ·  "
+                                       Foreground="{StaticResource MutedTextBrush}"/>
+                            <TextBlock Text="{Binding DoneTh1ngs.Count}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+
+            <!-- ===================================================== -->
+            <!-- CONTENT                                               -->
+            <!-- ===================================================== -->
+
+            <ScrollViewer Grid.Row="2"
+                          Padding="18,0,18,8"
+                          VerticalScrollBarVisibility="Hidden"
+                          HorizontalScrollBarVisibility="Disabled"
+                          CanContentScroll="True">
+                <Grid>
+
+
+                    <!-- OPEN -->
+
+                    <Grid Style="{StaticResource OpenSectionVisibilityStyle}">
+                        <TextBlock Text="Nothing is waiting."
+                                   Margin="0,28"
+                                   HorizontalAlignment="Center"
+                                   FontFamily="Segoe UI Variable Small"
+                                   FontSize="12"
+                                   Foreground="{StaticResource MutedTextBrush}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding OpenTh1ngs.Count}"
+                                                     Value="0">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <ItemsControl ItemsSource="{Binding OpenTh1ngs}"
+                                      ItemTemplate="{StaticResource Th1ngTemplate}"/>
+                    </Grid>
+
+
+                    <!-- DONE -->
+
+                    <Grid Style="{StaticResource DoneSectionVisibilityStyle}">
+                        <TextBlock Text="Nothing done yet."
+                                   Margin="0,28"
+                                   HorizontalAlignment="Center"
+                                   FontFamily="Segoe UI Variable Small"
+                                   FontSize="12"
+                                   Foreground="{StaticResource MutedTextBrush}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DoneTh1ngs.Count}"
+                                                     Value="0">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <ItemsControl ItemsSource="{Binding DoneTh1ngs}"
+                                      ItemTemplate="{StaticResource Th1ngTemplate}"/>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+
+
+            <!-- ===================================================== -->
+            <!-- ADD NEW TH1NG                                         -->
+            <!-- ===================================================== -->
+
+            <Border Grid.Row="3"
+                    Margin="18,6,18,10"
+                    Padding="10,4,6,4"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <Grid MinHeight="34">
+
+                    <!-- Placeholder -->
+
+
+                    <TextBlock Text="Add a new th1ng..."
+                               Margin="3,0,0,0"
+                               VerticalAlignment="Center"
+                               FontFamily="Segoe UI Variable Small"
+                               FontSize="13"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility"
+                                        Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding NewTh1ngText}"
+                                                 Value="">
+                                        <Setter Property="Visibility"
+                                                Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding NewTh1ngText,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                 VerticalContentAlignment="Center"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Foreground="{StaticResource PrimaryTextBrush}"
+                                 FontFamily="Segoe UI Variable Small"
+                                 FontSize="13"
+                                 CaretBrush="{StaticResource AccentBrush}"
+                                 ToolTip="Write a new th1ng">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter"
+                                            Command="{Binding AddTh1ngCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <Button Grid.Column="1"
+                                Command="{Binding AddTh1ngCommand}"
+                                Style="{StaticResource AddButtonStyle}"
+                                ToolTip="Add th1ng">
+                            <Path Data="{StaticResource AddGeometry}"
+                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                                   Path=Foreground}"
+                                  StrokeThickness="1.7"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"/>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
     </Border>
 </Window>
