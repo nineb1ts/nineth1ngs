@@ -119,9 +119,7 @@
                                     <DataTrigger Binding="{Binding IsCompleted}"
                                                  Value="True">
                                         <Setter Property="Opacity"
-                                                Value="0.55"/>
-                                        <Setter Property="TextDecorations"
-                                                Value="Strikethrough"/>
+                                                Value="0.45"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsEditing}"
                                                  Value="True">
@@ -268,12 +266,40 @@
                                     </TextBox.InputBindings>
                                 </TextBox>
                                 <StackPanel Orientation="Horizontal"
-                                            VerticalAlignment="Center"
-                                            Margin="-5,2,0,0">
-                                    <Button Style="{StaticResource CompletionIconButtonStyle}"
-                                            Command="{Binding DataContext.ToggleTimerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            VerticalAlignment="Center">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Margin"
+                                                    Value="-5,3,0,0"/>
+
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCompleted}"
+                                                             Value="True">
+                                                    <Setter Property="Margin"
+                                                            Value="0,3,0,0"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <Button Command="{Binding DataContext.ToggleTimerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             ToolTip="Start or pause timer">
+
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource CompletionIconButtonStyle}"
+                                                   TargetType="Button">
+                                                <Setter Property="Visibility"
+                                                        Value="Visible"/>
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCompleted}"
+                                                                 Value="True">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
                                         <Grid Width="15"
                                               Height="15">
                                             <Path Data="{StaticResource PlayGeometry}"
@@ -318,7 +344,22 @@
                                                FontFamily="Segoe UI Variable Small"
                                                FontSize="12"
                                                FontWeight="SemiBold"
-                                               Foreground="{StaticResource AccentBrush}"/>
+                                               Foreground="{StaticResource AccentBrush}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Margin"
+                                                        Value="6,0,0,0"/>
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCompleted}"
+                                                                 Value="True">
+                                                        <Setter Property="Margin"
+                                                                Value="0,0,0,0"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Grid.Column="1"
@@ -386,7 +427,8 @@
                         </Grid>
                     </Border>
 
-                    <StackPanel Margin="10,0,8,8">
+                    <StackPanel Margin="10,0,8,8"
+                                Background="Transparent">
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
                                 <Setter Property="Visibility"
@@ -407,7 +449,9 @@
                                 Opacity="0.45"/>
 
                         <ItemsControl ItemsSource="{Binding SubTh1ngs}"
-                                      ItemTemplate="{StaticResource SubTh1ngTemplate}"/>
+                                      ItemTemplate="{StaticResource SubTh1ngTemplate}"
+                                      Focusable="False"
+                                      FocusVisualStyle="{x:Null}"/>
 
                         <Button Command="{Binding DataContext.BeginAddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
@@ -523,6 +567,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
+
                 <StackPanel Grid.Column="0"
                             Margin="16,0,0,0"
                             Orientation="Horizontal"
@@ -530,11 +575,12 @@
                     <TextBlock Margin="8,0,0,1"
                                Text="nineth1ngs"
                                FontFamily="Segoe UI Variable Small"
-                               FontSize="12"
+                               FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource PrimaryTextBrush}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
+
                 <StackPanel Grid.Column="1"
                             Margin="0,6,8,6"
                             Orientation="Horizontal"
@@ -544,25 +590,24 @@
                             Style="{StaticResource WindowButtonStyle}"
                             ToolTip="Minimize">
                         <Path Data="{StaticResource MinimizeGeometry}"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
-                                               Path=Foreground}"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
                               StrokeThickness="1.4"
                               StrokeStartLineCap="Round"/>
                     </Button>
+
                     <Button Click="MaximizeClick"
                             Style="{StaticResource WindowButtonStyle}"
                             ToolTip="Maximize or restore">
                         <Path Data="{StaticResource MaximizeGeometry}"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
-                                               Path=Foreground}"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
                               StrokeThickness="1.2"/>
                     </Button>
+
                     <Button Click="CloseClick"
                             Style="{StaticResource WindowButtonStyle}"
                             ToolTip="Close">
                         <Path Data="{StaticResource CloseGeometry}"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
-                                               Path=Foreground}"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
                               StrokeThickness="1.4"
                               StrokeStartLineCap="Round"
                               StrokeEndLineCap="Round"/>
@@ -579,24 +624,34 @@
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center">
+
                     <Button Command="{Binding ShowOpenCommand}"
                             Style="{StaticResource OpenSectionButtonStyle}"
                             ToolTip="Show open th1ngs">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="TH1NGS"/>
+                            <TextBlock Text="TH1NGS"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"/>
                             <TextBlock Text="  ·  "
+                                       FontSize="12"
                                        Foreground="{StaticResource MutedTextBrush}"/>
-                            <TextBlock Text="{Binding OpenTh1ngs.Count}"/>
+                            <TextBlock Text="{Binding OpenTh1ngs.Count}"
+                                       FontSize="12"/>
                         </StackPanel>
                     </Button>
+
                     <Button Command="{Binding ShowDoneCommand}"
                             Style="{StaticResource DoneSectionButtonStyle}"
                             ToolTip="Show completed th1ngs">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="DONE"/>
+                            <TextBlock Text="DONE"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"/>
                             <TextBlock Text="  ·  "
+                                       FontSize="12"
                                        Foreground="{StaticResource MutedTextBrush}"/>
-                            <TextBlock Text="{Binding DoneTh1ngs.Count}"/>
+                            <TextBlock Text="{Binding DoneTh1ngs.Count}"
+                                       FontSize="12"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
