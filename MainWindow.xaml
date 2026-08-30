@@ -791,6 +791,7 @@
 
                                                     <Viewbox Width="15"
                                                              Height="15"
+                                                             Margin="-4,-2,0,0"
                                                              Stretch="Uniform">
                                                         <Viewbox.Style>
                                                             <Style TargetType="Viewbox">
