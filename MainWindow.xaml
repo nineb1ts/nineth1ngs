@@ -68,6 +68,10 @@
             <PathGeometry Figures="M20,6 L9,17 L4,12"/>
         </GeometryGroup>
 
+        <GeometryGroup x:Key="FeatherXGeometry">
+            <PathGeometry Figures="M18,6 L6,18 M6,6 L18,18"/>
+        </GeometryGroup>
+
         <GeometryGroup x:Key="FeatherRotateCcwGeometry">
             <PathGeometry Figures="M1,4 L1,10 L7,10 M3.51,15 A9,9 0 1 0 5.64,5.64 L1,10"/>
         </GeometryGroup>
@@ -544,6 +548,7 @@
                               Height="15">
                             <Viewbox Width="15"
                                      Height="15"
+                                     Margin="-2,-2,0,0"
                                      Stretch="Uniform">
                                 <Viewbox.Style>
                                     <Style TargetType="Viewbox">
@@ -616,8 +621,9 @@
                             ToolTip="Delete sub-th1ng">
                         <Viewbox Width="15"
                                  Height="15"
+                                 Margin="-2,-2,0,0"
                                  Stretch="Uniform">
-                            <Path Data="{StaticResource FeatherTrashGeometry}"
+                            <Path Data="{StaticResource FeatherXGeometry}"
                                   Fill="Transparent"
                                   Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
                                   StrokeThickness="1.8"
@@ -918,6 +924,7 @@
                                               Height="15">
                                             <Viewbox Width="15"
                                                      Height="15"
+                                                     Margin="-2,-2,0,0"
                                                      Stretch="Uniform">
                                                 <Viewbox.Style>
                                                     <Style TargetType="Viewbox">
@@ -989,8 +996,9 @@
                                             ToolTip="Delete th1ng">
                                         <Viewbox Width="15"
                                                  Height="15"
+                                                 Margin="-2,-2,0,0"
                                                  Stretch="Uniform">
-                                            <Path Data="{StaticResource FeatherTrashGeometry}"
+                                            <Path Data="{StaticResource FeatherXGeometry}"
                                                   Fill="Transparent"
                                                   Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
                                                   StrokeThickness="1.8"
