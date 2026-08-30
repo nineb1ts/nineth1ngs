@@ -32,16 +32,17 @@ public class TimeFormattingService
     {
         var totalMinutes = elapsedSeconds / 60.0;
 
-        var lowerStep =
-            Math.Floor(totalMinutes / interval) * interval;
+        if (elapsedSeconds > 0 && totalMinutes < interval)
+        {
+            totalMinutes = interval;
+        }
 
-        var minutesIntoInterval =
-            totalMinutes - lowerStep;
+        var lowerStep = Math.Floor(totalMinutes / interval) * interval;
+        var minutesIntoInterval = totalMinutes - lowerStep;
 
-        var roundedMinutes =
-            minutesIntoInterval >= threshold
-                ? lowerStep + interval
-                : lowerStep;
+        var roundedMinutes = minutesIntoInterval >= threshold
+            ? lowerStep + interval
+            : lowerStep;
 
         return (int)roundedMinutes;
     }
