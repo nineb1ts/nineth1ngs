@@ -531,6 +531,52 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+
+    public async Task<bool> ResumeTimerAfterSessionUnlockAsync(
+        Th1ng th1ng,
+        DateTime resumedAtUtc)
+    {
+        if (th1ng.ParentId.HasValue ||
+            th1ng.IsCompleted ||
+            th1ng.IsTimerRunning)
+        {
+            return false;
+        }
+
+        foreach (var runningTh1ng in OpenTh1ngs
+                     .Concat(DoneTh1ngs)
+                     .Where(candidate =>
+                         candidate.IsTimerRunning &&
+                         !ReferenceEquals(candidate, th1ng)))
+        {
+            if (!await PauseTimerAsync(
+                    runningTh1ng,
+                    resumedAtUtc))
+            {
+                return false;
+            }
+        }
+
+        var previousTimerStartedAt = th1ng.TimerStartedAt;
+        th1ng.TimerStartedAt = resumedAtUtc;
+
+        try
+        {
+            await store.UpdateAsync(th1ng);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            th1ng.TimerStartedAt = previousTimerStartedAt;
+
+            ReportError(
+                "The timer could not be resumed after unlocking Windows.",
+                exception);
+
+            return false;
+        }
+    }
+
     [RelayCommand]
     private async Task CopyTrackedTimeAsync(Th1ng th1ng)
     {

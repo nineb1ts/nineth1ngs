@@ -203,13 +203,18 @@ public partial class MainWindow : Window
 
         var lockedAtUtc = sessionLockedAtUtc.Value;
         var previouslyRunningTh1ng = sessionLockedTimerTh1ng;
+        var unlockedAtUtc = DateTime.UtcNow;
 
         sessionLockedAtUtc = null;
         sessionLockedTimerTh1ng = null;
 
+        await viewModel.ResumeTimerAfterSessionUnlockAsync(
+            previouslyRunningTh1ng,
+            unlockedAtUtc);
+
         var lockedSeconds = Math.Max(
             0,
-            (int)(DateTime.UtcNow - lockedAtUtc).TotalSeconds);
+            (int)(unlockedAtUtc - lockedAtUtc).TotalSeconds);
 
         if (lockedSeconds < 60)
         {

@@ -70,18 +70,19 @@ public partial class SessionTimeReviewWindow : Window
 
         private static string FormatDuration(int totalSeconds)
         {
-            var duration = TimeSpan.FromSeconds(totalSeconds);
+            var duration = TimeSpan.FromSeconds(
+                Math.Max(0, totalSeconds));
 
-            if (duration.TotalHours >= 1)
+            var hours = (int)duration.TotalHours;
+            var minutes = duration.Minutes;
+            var seconds = duration.Seconds;
+
+            if (hours > 0)
             {
-                var hours = (int)duration.TotalHours;
-
-                return duration.Minutes == 0
-                    ? $"{hours} h"
-                    : $"{hours} h {duration.Minutes} min";
+                return $"{hours} h {minutes} min {seconds} sec";
             }
 
-            return $"{Math.Max(1, (int)duration.TotalMinutes)} min";
+            return $"{minutes} min {seconds} sec";
         }
     }
 }
