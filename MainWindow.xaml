@@ -660,6 +660,11 @@
                                             <Setter Property="Visibility"
                                                     Value="Collapsed"/>
                                         </DataTrigger>
+                                        <DataTrigger Binding="{Binding DataContext.SelectedSection, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                     Value="done">
+                                            <Setter Property="Visibility"
+                                                    Value="Collapsed"/>
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
@@ -678,11 +683,16 @@
                                             Value="Collapsed"/>
 
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsAddingSubTh1ng}"
-                                                     Value="True">
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsAddingSubTh1ng}"
+                                                           Value="True"/>
+                                                <Condition Binding="{Binding DataContext.SelectedSection, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                           Value="th1ngs"/>
+                                            </MultiDataTrigger.Conditions>
                                             <Setter Property="Visibility"
                                                     Value="Visible"/>
-                                        </DataTrigger>
+                                        </MultiDataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>

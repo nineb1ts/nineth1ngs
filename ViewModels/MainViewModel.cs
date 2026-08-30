@@ -122,7 +122,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task AddSubTh1ngAsync(Th1ng parent)
     {
-        if (parent.ParentId.HasValue)
+        if (SelectedSection == "done" || parent.ParentId.HasValue)
         {
             return;
         }
@@ -282,18 +282,25 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void BeginEditing(Th1ng th1ng)
     {
+        if (SelectedSection == "done")
+        {
+            return;
+        }
+
         th1ng.EditText = th1ng.Text;
         th1ng.IsEditing = true;
     }
 
     [RelayCommand]
-    private static void BeginAddSubTh1ng(Th1ng parent)
+    private void BeginAddSubTh1ng(Th1ng parent)
     {
-        if (!parent.ParentId.HasValue)
+        if (SelectedSection == "done" || parent.ParentId.HasValue)
         {
-            parent.IsExpanded = true;
-            parent.IsAddingSubTh1ng = true;
+            return;
         }
+
+        parent.IsExpanded = true;
+        parent.IsAddingSubTh1ng = true;
     }
 
     [RelayCommand]
@@ -306,6 +313,13 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveEditingAsync(Th1ng th1ng)
     {
+        if (SelectedSection == "done")
+        {
+            th1ng.EditText = th1ng.Text;
+            th1ng.IsEditing = false;
+            return;
+        }
+
         var text = th1ng.EditText.Trim();
 
         if (text.Length == 0 && th1ng.ParentId.HasValue)
