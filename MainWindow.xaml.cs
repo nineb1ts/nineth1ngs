@@ -135,7 +135,7 @@ public partial class MainWindow : Window
     {
         while (source is not null)
         {
-            if (source is Button or TextBox)
+            if (source is Button or TextBox or TextBlock)
             {
                 return true;
             }
@@ -192,6 +192,24 @@ public partial class MainWindow : Window
         {
             viewModel.SaveEditingCommand.Execute(editingTh1ng);
         }
+    }
+
+    private void EditTextBoxIsVisibleChanged(
+    object sender,
+    DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is not TextBox textBox)
+            return;
+
+        if (textBox.Visibility != Visibility.Visible)
+            return;
+
+        textBox.Dispatcher.BeginInvoke(() =>
+        {
+            textBox.Focus();
+            Keyboard.Focus(textBox);
+            textBox.CaretIndex = textBox.Text.Length;
+        });
     }
 
     private const int DwmWindowCornerPreferenceAttribute = 33;

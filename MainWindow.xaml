@@ -108,7 +108,7 @@
                     <TextBlock Text="{Binding Text}"
                                VerticalAlignment="Center"
                                FontFamily="Segoe UI Variable Small"
-                               FontSize="13"
+                               FontSize="16"
                                Foreground="{StaticResource SecondaryTextBrush}"
                                TextTrimming="CharacterEllipsis">
                         <TextBlock.Style>
@@ -137,7 +137,15 @@
                     </TextBlock>
                     <TextBox Text="{Binding EditText, UpdateSourceTrigger=PropertyChanged}"
                              TextWrapping="Wrap"
-                             FontSize="13">
+                             FontFamily="Segoe UI Variable Small"
+                             FontSize="16"
+                             Margin="0"
+                             Padding="0"
+                             VerticalContentAlignment="Center"
+                             Background="Transparent"
+                             BorderBrush="Transparent"
+                             BorderThickness="0"
+                             IsVisibleChanged="EditTextBoxIsVisibleChanged">
                         <TextBox.Style>
                             <Style BasedOn="{StaticResource InlineEditTextBoxStyle}"
                                    TargetType="TextBox">
@@ -219,7 +227,8 @@
                     BorderThickness="1"
                     CornerRadius="8">
                 <StackPanel>
-                    <Border Padding="11,8"
+                    <Border Padding="16,14"
+                            MinHeight="86"
                             Background="Transparent"
                             BorderThickness="0"
                             MouseLeftButtonUp="Th1ngRowMouseLeftButtonUp">
@@ -233,7 +242,24 @@
                                 <TextBlock Text="{Binding CreatedAt, Converter={StaticResource TimestampConverter}}"
                                            Style="{StaticResource TimestampStyle}"/>
                                 <TextBlock Text="{Binding Text}"
-                                           Style="{StaticResource Th1ngTextStyle}">
+                                           FontSize="18">
+                                    <TextBlock.Style>
+                                        <Style BasedOn="{StaticResource Th1ngTextStyle}"
+                                               TargetType="TextBlock">
+
+                                            <Setter Property="Opacity"
+                                                    Value="0.72"/>
+
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditing}"
+                                                             Value="True">
+                                                    <Setter Property="Visibility"
+                                                            Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+
                                     <TextBlock.InputBindings>
                                         <MouseBinding MouseAction="LeftDoubleClick"
                                                       Command="{Binding DataContext.BeginEditingCommand, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -241,7 +267,16 @@
                                     </TextBlock.InputBindings>
                                 </TextBlock>
                                 <TextBox Text="{Binding EditText, UpdateSourceTrigger=PropertyChanged}"
-                                         TextWrapping="Wrap">
+                                         TextWrapping="Wrap"
+                                         FontFamily="Segoe UI Variable Small"
+                                         FontSize="18"
+                                         Margin="0"
+                                         Padding="0"
+                                         VerticalContentAlignment="Center"
+                                         Background="Transparent"
+                                         BorderBrush="Transparent"
+                                         BorderThickness="0"
+                                         IsVisibleChanged="EditTextBoxIsVisibleChanged">
                                     <TextBox.Style>
                                         <Style BasedOn="{StaticResource InlineEditTextBoxStyle}"
                                                TargetType="TextBox">
@@ -342,7 +377,7 @@
                                     <TextBlock Text="{Binding ElapsedTimeText}"
                                                VerticalAlignment="Center"
                                                FontFamily="Segoe UI Variable Small"
-                                               FontSize="12"
+                                               FontSize="14"
                                                FontWeight="SemiBold"
                                                Foreground="{StaticResource AccentBrush}">
                                         <TextBlock.Style>
@@ -482,11 +517,18 @@
                             </Button.Style>
                         </Button>
 
-                        <Grid Margin="8,3,0,0">
-                            <Grid.Style>
-                                <Style TargetType="Grid">
+                        <Border Margin="8,3,0,0"
+                                Padding="10,4,6,4"
+                                Background="{StaticResource SurfaceBrush}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+
+                            <Border.Style>
+                                <Style TargetType="Border">
                                     <Setter Property="Visibility"
                                             Value="Collapsed"/>
+
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsAddingSubTh1ng}"
                                                      Value="True">
@@ -495,44 +537,55 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Grid.Style>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0"
-                                     Text="{Binding NewSubTh1ngText, UpdateSourceTrigger=PropertyChanged}"
-                                     VerticalContentAlignment="Center"
-                                     Background="{StaticResource WindowBackgroundBrush}"
-                                     BorderBrush="{StaticResource BorderBrush}"
-                                     BorderThickness="1"
-                                     Foreground="{StaticResource PrimaryTextBrush}"
-                                     FontFamily="Segoe UI Variable Small"
-                                     FontSize="13"
-                                     Padding="7,4"
-                                     CaretBrush="{StaticResource AccentBrush}"
-                                     ToolTip="Write a sub-th1ng">
-                                <TextBox.InputBindings>
-                                    <KeyBinding Key="Enter"
-                                                Command="{Binding DataContext.AddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"/>
-                                    <KeyBinding Key="Escape"
-                                                Command="{Binding DataContext.CancelAddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"/>
-                                </TextBox.InputBindings>
-                            </TextBox>
-                            <Button Grid.Column="1"
-                                    Command="{Binding DataContext.AddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Style="{StaticResource AddButtonStyle}"
-                                    ToolTip="Add sub-th1ng">
-                                <Path Data="{StaticResource AddGeometry}"
-                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                      StrokeThickness="1.7"
-                                      StrokeStartLineCap="Round"
-                                      StrokeEndLineCap="Round"/>
-                            </Button>
-                        </Grid>
+                            </Border.Style>
+
+                            <Grid MinHeight="34">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding NewSubTh1ngText,
+                                UpdateSourceTrigger=PropertyChanged}"
+                                         VerticalContentAlignment="Center"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         Foreground="{StaticResource PrimaryTextBrush}"
+                                         FontFamily="Segoe UI Variable Small"
+                                         FontSize="13"
+                                         CaretBrush="{StaticResource AccentBrush}"
+                                         ToolTip="Write a sub-th1ng">
+
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter"
+                                                    Command="{Binding DataContext.AddSubTh1ngCommand,
+                                              RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"/>
+
+                                        <KeyBinding Key="Escape"
+                                                    Command="{Binding DataContext.CancelAddSubTh1ngCommand,
+                                              RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
+
+                                <Button Grid.Column="1"
+                                        Command="{Binding DataContext.AddSubTh1ngCommand,
+                                  RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource AddButtonStyle}"
+                                        ToolTip="Add sub-th1ng">
+
+                                    <Path Data="{StaticResource AddGeometry}"
+                                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                   Path=Foreground}"
+                                          StrokeThickness="1.7"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"/>
+                                </Button>
+                            </Grid>
+                        </Border>
                     </StackPanel>
                 </StackPanel>
             </Border>
