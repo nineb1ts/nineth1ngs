@@ -1093,7 +1093,7 @@
         <Grid Background="{StaticResource WindowBackgroundBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="42"/>
-                <RowDefinition Height="38"/>
+                <RowDefinition Height="44"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="64"/>
             </Grid.RowDefinitions>
@@ -1229,6 +1229,7 @@
 
                 <Grid Style="{StaticResource SettingsNavigationVisibilityStyle}"
                       Height="38"
+                      Margin="-6,0,0,0"
                       VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center">
@@ -1486,7 +1487,7 @@
                                Margin="3,0,0,0"
                                VerticalAlignment="Center"
                                FontFamily="Segoe UI Variable Small"
-                               FontSize="13"
+                               FontSize="15"
                                Foreground="{StaticResource MutedTextBrush}"
                                IsHitTestVisible="False">
                         <TextBlock.Style>
