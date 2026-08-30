@@ -17,8 +17,12 @@ public partial class MainViewModel : ObservableObject
     private readonly TimeFormattingService timeFormattingService = new();
     private readonly TimeCopySettingsService timeCopySettingsService;
     private readonly TimeCopySettings timeCopySettings;
+    private readonly Th1ngOrderService th1ngOrderService = new();
     private string previousSection = "th1ngs";
     public string RoundUpThresholdHint => $"Choose a value from 1 to {BillingIntervalMinutes - 1} minutes.";
+
+    public IReadOnlyList<int> RoundUpThresholds =>
+        Enumerable.Range(1, BillingIntervalMinutes - 1).ToList();
 
     public MainViewModel(
         Th1ngStore store,
@@ -33,13 +37,17 @@ public partial class MainViewModel : ObservableObject
 
         timeCopySettings = timeCopySettingsService.Load();
 
-        var maximumThreshold = Math.Max(1, timeCopySettings.BillingIntervalMinutes - 1);
+        var maximumThreshold = Math.Max(
+            1,
+            timeCopySettings.BillingIntervalMinutes - 1);
 
         if (timeCopySettings.RoundUpThresholdMinutes < 1 ||
             timeCopySettings.RoundUpThresholdMinutes > maximumThreshold)
         {
-            timeCopySettings.RoundUpThresholdMinutes =
-                Math.Clamp(timeCopySettings.RoundUpThresholdMinutes, 1, maximumThreshold);
+            timeCopySettings.RoundUpThresholdMinutes = Math.Clamp(
+                timeCopySettings.RoundUpThresholdMinutes,
+                1,
+                maximumThreshold);
 
             timeCopySettingsService.Save(timeCopySettings);
         }
@@ -64,9 +72,6 @@ public partial class MainViewModel : ObservableObject
         45,
         60
     ];
-
-    public IReadOnlyList<int> RoundUpThresholds =>
-        Enumerable.Range(1, BillingIntervalMinutes - 1).ToList();
 
     public IReadOnlyList<TimeOutputFormat> OutputFormats { get; } =
     [
@@ -114,12 +119,9 @@ public partial class MainViewModel : ObservableObject
         get => timeCopySettings.RoundUpThresholdMinutes;
         set
         {
-            if (value < 1 || value >= BillingIntervalMinutes)
-            {
-                return;
-            }
-
-            if (timeCopySettings.RoundUpThresholdMinutes == value)
+            if (value < 1 ||
+                value >= BillingIntervalMinutes ||
+                timeCopySettings.RoundUpThresholdMinutes == value)
             {
                 return;
             }
@@ -148,7 +150,8 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public string TimeCopyExample => $"1 h 17 min tracked → {timeFormattingService.FormatForCopy(77 * 60, timeCopySettings)}";
+    public string TimeCopyExample =>
+        $"1 h 17 min tracked → {timeFormattingService.FormatForCopy(77 * 60, timeCopySettings)}";
 
     [RelayCommand]
     private void ShowOpen()
@@ -218,6 +221,8 @@ public partial class MainViewModel : ObservableObject
 
                 AddToSection(th1ng);
             }
+
+            ApplySavedOpenOrder();
         }
         catch (Exception exception)
         {
@@ -248,6 +253,7 @@ public partial class MainViewModel : ObservableObject
             await store.AddAsync(th1ng);
 
             OpenTh1ngs.Insert(0, th1ng);
+            SaveOpenOrder();
             NewTh1ngText = string.Empty;
         }
         catch (Exception exception)
@@ -407,6 +413,7 @@ public partial class MainViewModel : ObservableObject
             if (!th1ng.ParentId.HasValue)
             {
                 RefreshSections(th1ng);
+                SaveOpenOrder();
             }
         }
         catch
@@ -540,6 +547,7 @@ public partial class MainViewModel : ObservableObject
             {
                 OpenTh1ngs.Remove(th1ng);
                 DoneTh1ngs.Remove(th1ng);
+                SaveOpenOrder();
             }
         }
         catch (Exception exception)
@@ -619,6 +627,111 @@ public partial class MainViewModel : ObservableObject
         OpenTh1ngs.Remove(th1ng);
         DoneTh1ngs.Remove(th1ng);
         AddToSection(th1ng);
+    }
+
+    public void MoveOpenTh1ng(
+        Th1ng source,
+        Th1ng target,
+        bool insertAfter)
+    {
+        if (source.ParentId.HasValue ||
+            target.ParentId.HasValue ||
+            source.IsCompleted ||
+            target.IsCompleted ||
+            ReferenceEquals(source, target))
+        {
+            return;
+        }
+
+        var sourceIndex = OpenTh1ngs.IndexOf(source);
+        var targetIndex = OpenTh1ngs.IndexOf(target);
+
+        if (sourceIndex < 0 ||
+            targetIndex < 0)
+        {
+            return;
+        }
+
+        OpenTh1ngs.RemoveAt(sourceIndex);
+
+        if (sourceIndex < targetIndex)
+        {
+            targetIndex--;
+        }
+
+        if (insertAfter)
+        {
+            targetIndex++;
+        }
+
+        targetIndex = Math.Clamp(
+            targetIndex,
+            0,
+            OpenTh1ngs.Count);
+
+        OpenTh1ngs.Insert(
+            targetIndex,
+            source);
+
+        SaveOpenOrder();
+    }
+
+    private void ApplySavedOpenOrder()
+    {
+        var savedOrder = th1ngOrderService.Load();
+
+        if (savedOrder.Count == 0 ||
+            OpenTh1ngs.Count < 2)
+        {
+            return;
+        }
+
+        var positions = savedOrder
+            .Select((id, index) => new
+            {
+                Id = id,
+                Index = index
+            })
+            .ToDictionary(
+                item => item.Id,
+                item => item.Index);
+
+        var ordered = OpenTh1ngs
+            .Select((th1ng, currentIndex) => new
+            {
+                Th1ng = th1ng,
+                CurrentIndex = currentIndex,
+                SavedIndex = positions.TryGetValue(
+                    th1ng.Id.ToString() ?? string.Empty,
+                    out var savedIndex)
+                    ? savedIndex
+                    : int.MaxValue
+            })
+            .OrderBy(item => item.SavedIndex)
+            .ThenBy(item => item.CurrentIndex)
+            .Select(item => item.Th1ng)
+            .ToList();
+
+        OpenTh1ngs.Clear();
+
+        foreach (var th1ng in ordered)
+        {
+            OpenTh1ngs.Add(th1ng);
+        }
+    }
+
+    private void SaveOpenOrder()
+    {
+        try
+        {
+            th1ngOrderService.Save(OpenTh1ngs);
+        }
+        catch (Exception exception)
+        {
+            ReportError(
+                "The th1ng order could not be saved.",
+                exception);
+        }
     }
 
     private Th1ng? FindParent(Th1ng subTh1ng) =>

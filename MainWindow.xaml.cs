@@ -18,6 +18,11 @@ public partial class MainWindow : Window
 {
     private readonly WindowSettingsService settingsService;
     private bool globalHotkeyRegistered;
+    private System.Windows.Point dragStartPoint;
+    private Th1ng? draggedTh1ng;
+    private Border? currentDropTarget;
+    private Border? currentDropIndicator;
+    private bool currentInsertAfter;
 
     public MainWindow(
         Th1ngStore store,
@@ -202,6 +207,167 @@ public partial class MainWindow : Window
         }
     }
 
+    private void Th1ngCardPreviewMouseLeftButtonDown(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        dragStartPoint = e.GetPosition(this);
+        draggedTh1ng = null;
+
+        if (sender is not Border
+            {
+                DataContext: Th1ng th1ng
+            } ||
+            th1ng.ParentId.HasValue ||
+            th1ng.IsCompleted ||
+            IsDragBlockedElement(e.OriginalSource as DependencyObject))
+        {
+            return;
+        }
+
+        draggedTh1ng = th1ng;
+    }
+
+    private void Th1ngCardPreviewMouseMove(
+        object sender,
+        MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed ||
+            draggedTh1ng is null)
+        {
+            return;
+        }
+
+        var currentPosition = e.GetPosition(this);
+
+        if (Math.Abs(currentPosition.X - dragStartPoint.X) <
+                SystemParameters.MinimumHorizontalDragDistance &&
+            Math.Abs(currentPosition.Y - dragStartPoint.Y) <
+                SystemParameters.MinimumVerticalDragDistance)
+        {
+            return;
+        }
+
+        var source = draggedTh1ng;
+        draggedTh1ng = null;
+
+        _ = DragDrop.DoDragDrop(
+            (DependencyObject)sender,
+            new DataObject(typeof(Th1ng), source),
+            DragDropEffects.Move);
+
+        ClearDropTarget();
+    }
+
+    private void Th1ngCardDragOver(
+        object sender,
+        DragEventArgs e)
+    {
+        if (sender is not Border targetCard ||
+            targetCard.DataContext is not Th1ng target ||
+            !e.Data.GetDataPresent(typeof(Th1ng)) ||
+            e.Data.GetData(typeof(Th1ng)) is not Th1ng source ||
+            ReferenceEquals(source, target) ||
+            source.ParentId.HasValue ||
+            target.ParentId.HasValue ||
+            source.IsCompleted ||
+            target.IsCompleted)
+        {
+            e.Effects = DragDropEffects.None;
+            e.Handled = true;
+            ClearDropTarget();
+            return;
+        }
+
+        e.Effects = DragDropEffects.Move;
+        e.Handled = true;
+
+        var pointer = e.GetPosition(targetCard);
+        var insertAfter =
+            pointer.Y > targetCard.ActualHeight / 2;
+
+        if (!ReferenceEquals(currentDropTarget, targetCard) ||
+            currentInsertAfter != insertAfter)
+        {
+            ClearDropTarget();
+
+            currentDropTarget = targetCard;
+            currentInsertAfter = insertAfter;
+
+            if (targetCard.Parent is Grid container)
+            {
+                currentDropIndicator = container.Children
+                    .OfType<Border>()
+                    .FirstOrDefault(border =>
+                        border.Name == (insertAfter
+                            ? "BottomDropIndicator"
+                            : "TopDropIndicator"));
+            }
+
+            if (currentDropIndicator is not null)
+            {
+                currentDropIndicator.Visibility = Visibility.Visible;
+            }
+
+
+        }
+    }
+
+    private void Th1ngCardDragLeave(
+        object sender,
+        DragEventArgs e)
+    {
+        if (ReferenceEquals(
+                sender,
+                currentDropTarget))
+        {
+            ClearDropTarget();
+        }
+    }
+
+    private void Th1ngCardDrop(
+        object sender,
+        DragEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel ||
+            sender is not Border targetCard ||
+            targetCard.DataContext is not Th1ng target ||
+            !e.Data.GetDataPresent(typeof(Th1ng)) ||
+            e.Data.GetData(typeof(Th1ng)) is not Th1ng source)
+        {
+            ClearDropTarget();
+            return;
+        }
+
+        var pointer = e.GetPosition(targetCard);
+        var insertAfter =
+            pointer.Y > targetCard.ActualHeight / 2;
+
+        viewModel.MoveOpenTh1ng(
+            source,
+            target,
+            insertAfter);
+
+        e.Handled = true;
+        ClearDropTarget();
+    }
+
+    private void ClearDropTarget()
+    {
+        if (currentDropIndicator is not null)
+        {
+            currentDropIndicator.Visibility = Visibility.Collapsed;
+            currentDropIndicator = null;
+        }
+
+        if (currentDropTarget is not null)
+        {
+            currentDropTarget = null;
+        }
+
+        currentInsertAfter = false;
+    }
+
     private void MinimizeClick(
         object sender,
         RoutedEventArgs e)
@@ -228,6 +394,35 @@ public partial class MainWindow : Window
         WindowState = WindowState == WindowState.Maximized
             ? WindowState.Normal
             : WindowState.Maximized;
+    }
+
+    private static bool IsDragBlockedElement(
+        DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is Button or TextBox)
+            {
+                return true;
+            }
+
+            if (source is TextBlock textBlock)
+            {
+                var hasSingleClickBinding = textBlock.InputBindings
+                    .OfType<MouseBinding>()
+                    .Any(binding =>
+                        binding.MouseAction == MouseAction.LeftClick);
+
+                if (hasSingleClickBinding)
+                {
+                    return true;
+                }
+            }
+
+            source = VisualTreeHelper.GetParent(source);
+        }
+
+        return false;
     }
 
     private static bool IsInteractiveElement(
