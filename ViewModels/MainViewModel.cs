@@ -15,17 +15,27 @@ public partial class MainViewModel : ObservableObject
     private readonly Action<string> showError;
     private readonly DispatcherTimer timer;
     private readonly TimeFormattingService timeFormattingService = new();
-    private readonly TimeCopySettings timeCopySettings = new();
+    private readonly TimeCopySettingsService timeCopySettingsService;
+    private readonly TimeCopySettings timeCopySettings;
 
     public MainViewModel(
         Th1ngStore store,
+        TimeCopySettingsService timeCopySettingsService,
         Func<Th1ng, Task<bool>>? confirmDelete = null,
         Action<string>? showError = null)
     {
         this.store = store;
+        this.timeCopySettingsService = timeCopySettingsService;
         this.confirmDelete = confirmDelete ?? (_ => Task.FromResult(false));
         this.showError = showError ?? (_ => { });
-        timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+
+        timeCopySettings = timeCopySettingsService.Load();
+
+        timer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+
         timer.Tick += TimerTick;
         timer.Start();
     }

@@ -27,8 +27,11 @@ public partial class MainWindow : Window
 
         this.settingsService = settingsService;
 
+        var timeCopySettingsService = new TimeCopySettingsService();
+
         DataContext = new MainViewModel(
             store,
+            timeCopySettingsService,
             ConfirmDeleteAsync,
             ShowError);
 
