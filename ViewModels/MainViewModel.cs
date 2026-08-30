@@ -461,6 +461,15 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    public async Task PauseRunningTimersAsync()
+    {
+        foreach (var th1ng in OpenTh1ngs.Concat(DoneTh1ngs)
+                     .Where(th1ng => th1ng.IsTimerRunning))
+        {
+            await PauseTimerAsync(th1ng);
+        }
+    }
+
     private void TimerTick(object? sender, EventArgs e)
     {
         foreach (var th1ng in OpenTh1ngs.Concat(DoneTh1ngs))

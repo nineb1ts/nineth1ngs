@@ -43,7 +43,7 @@ public partial class MainWindow : Window
         }
 
         Loaded += MainWindowLoaded;
-        Closed += MainWindowClosed;
+        Closing += MainWindowClosing;
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -88,27 +88,6 @@ public partial class MainWindow : Window
         Loaded -= MainWindowLoaded;
 
         await ((MainViewModel)DataContext).LoadAsync();
-    }
-
-    private void MainWindowClosed(
-        object? sender,
-        EventArgs e)
-    {
-        try
-        {
-            settingsService.Save(new Models.WindowSettings
-            {
-                Width = Width,
-                Height = Height,
-                Left = Left,
-                Top = Top
-            });
-        }
-        catch (Exception exception)
-        {
-            ShowError(
-                $"The window settings could not be saved.\n\n{exception.Message}");
-        }
     }
 
     private void TitleBarMouseLeftButtonDown(
@@ -243,6 +222,29 @@ public partial class MainWindow : Window
         if (viewModel.SaveEditingCommand.CanExecute(editingTh1ng))
         {
             viewModel.SaveEditingCommand.Execute(editingTh1ng);
+        }
+    }
+
+    private async void MainWindowClosing(
+    object? sender,
+    System.ComponentModel.CancelEventArgs e)
+    {
+        try
+        {
+            await ((MainViewModel)DataContext).PauseRunningTimersAsync();
+
+            settingsService.Save(new Models.WindowSettings
+            {
+                Width = Width,
+                Height = Height,
+                Left = Left,
+                Top = Top
+            });
+        }
+        catch (Exception exception)
+        {
+            ShowError(
+                $"The application state could not be saved.\n\n{exception.Message}");
         }
     }
 
