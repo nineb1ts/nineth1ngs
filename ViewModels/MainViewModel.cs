@@ -478,6 +478,59 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    public async Task<Th1ng?> PauseRunningTimerForSessionLockAsync(
+        DateTime lockedAtUtc)
+    {
+        var runningTh1ng = OpenTh1ngs
+            .Concat(DoneTh1ngs)
+            .FirstOrDefault(th1ng => th1ng.IsTimerRunning);
+
+        if (runningTh1ng is null)
+        {
+            return null;
+        }
+
+        return await PauseTimerAsync(
+            runningTh1ng,
+            lockedAtUtc)
+            ? runningTh1ng
+            : null;
+    }
+
+    public async Task<bool> AddElapsedTimeAsync(
+        Th1ng th1ng,
+        int elapsedSeconds)
+    {
+        if (elapsedSeconds <= 0 ||
+            th1ng.ParentId.HasValue ||
+            th1ng.IsCompleted)
+        {
+            return false;
+        }
+
+        var previousElapsedSeconds = th1ng.ElapsedSeconds;
+
+        th1ng.ElapsedSeconds += elapsedSeconds;
+        th1ng.RefreshTimerDisplay();
+
+        try
+        {
+            await store.UpdateAsync(th1ng);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            th1ng.ElapsedSeconds = previousElapsedSeconds;
+            th1ng.RefreshTimerDisplay();
+
+            ReportError(
+                "The session time could not be added.",
+                exception);
+
+            return false;
+        }
+    }
+
     [RelayCommand]
     private async Task CopyTrackedTimeAsync(Th1ng th1ng)
     {
@@ -577,12 +630,14 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private async Task<bool> PauseTimerAsync(Th1ng th1ng)
+    private async Task<bool> PauseTimerAsync(
+        Th1ng th1ng,
+        DateTime? stoppedAtUtc = null)
     {
         var previousElapsedSeconds = th1ng.ElapsedSeconds;
         var previousTimerStartedAt = th1ng.TimerStartedAt;
 
-        th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds();
+        th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds(stoppedAtUtc);
         th1ng.TimerStartedAt = null;
 
         try

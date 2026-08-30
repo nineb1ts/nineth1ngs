@@ -23,6 +23,10 @@ public partial class MainWindow : Window
     private Border? currentDropTarget;
     private Border? currentDropIndicator;
     private bool currentInsertAfter;
+    private bool sessionNotificationsRegistered;
+    private DateTime? sessionLockedAtUtc;
+    private Th1ng? sessionLockedTimerTh1ng;
+    private bool sessionTimeReviewOpen;
 
     public MainWindow(
         Th1ngStore store,
@@ -64,6 +68,18 @@ public partial class MainWindow : Window
 
         source?.AddHook(WindowProc);
 
+        sessionNotificationsRegistered =
+            WTSRegisterSessionNotification(
+                windowHandle,
+                NotifyForThisSession);
+
+        if (!sessionNotificationsRegistered)
+        {
+            ShowError(
+                "Windows session notifications could not be registered.\n\n" +
+                "Automatic timer handling when the screen is locked will be unavailable.");
+        }
+
         globalHotkeyRegistered = RegisterHotKey(
             windowHandle,
             GlobalHotkeyId,
@@ -93,9 +109,16 @@ public partial class MainWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        var windowHandle = new WindowInteropHelper(this).Handle;
+
+        if (sessionNotificationsRegistered)
+        {
+            _ = WTSUnRegisterSessionNotification(windowHandle);
+            sessionNotificationsRegistered = false;
+        }
+
         if (globalHotkeyRegistered)
         {
-            var windowHandle = new WindowInteropHelper(this).Handle;
             _ = UnregisterHotKey(windowHandle, GlobalHotkeyId);
             globalHotkeyRegistered = false;
         }
@@ -144,6 +167,97 @@ public partial class MainWindow : Window
         {
             ShowError(
                 $"The application state could not be saved.\n\n{exception.Message}");
+        }
+    }
+
+    private async Task HandleSessionLockAsync()
+    {
+        if (sessionLockedAtUtc.HasValue ||
+            DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        var lockedAtUtc = DateTime.UtcNow;
+        sessionLockedAtUtc = lockedAtUtc;
+
+        sessionLockedTimerTh1ng =
+            await viewModel.PauseRunningTimerForSessionLockAsync(
+                lockedAtUtc);
+
+        if (sessionLockedTimerTh1ng is null)
+        {
+            sessionLockedAtUtc = null;
+        }
+    }
+
+    private async Task HandleSessionUnlockAsync()
+    {
+        if (sessionTimeReviewOpen ||
+            !sessionLockedAtUtc.HasValue ||
+            sessionLockedTimerTh1ng is null ||
+            DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        var lockedAtUtc = sessionLockedAtUtc.Value;
+        var previouslyRunningTh1ng = sessionLockedTimerTh1ng;
+
+        sessionLockedAtUtc = null;
+        sessionLockedTimerTh1ng = null;
+
+        var lockedSeconds = Math.Max(
+            0,
+            (int)(DateTime.UtcNow - lockedAtUtc).TotalSeconds);
+
+        if (lockedSeconds < 60)
+        {
+            return;
+        }
+
+        var availableTh1ngs = viewModel.OpenTh1ngs
+            .Where(th1ng =>
+                !th1ng.ParentId.HasValue &&
+                !th1ng.IsCompleted)
+            .ToList();
+
+        if (availableTh1ngs.Count == 0)
+        {
+            return;
+        }
+
+        sessionTimeReviewOpen = true;
+
+        try
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
+
+            Show();
+            Activate();
+
+            var dialog = new Views.SessionTimeReviewWindow(
+                lockedSeconds,
+                availableTh1ngs,
+                previouslyRunningTh1ng.Id)
+            {
+                Owner = this
+            };
+
+            if (dialog.ShowDialog() == true &&
+                dialog.SelectedTh1ng is not null)
+            {
+                await viewModel.AddElapsedTimeAsync(
+                    dialog.SelectedTh1ng,
+                    lockedSeconds);
+            }
+        }
+        finally
+        {
+            sessionTimeReviewOpen = false;
         }
     }
 
@@ -585,6 +699,22 @@ public partial class MainWindow : Window
         IntPtr lParam,
         ref bool handled)
     {
+        if (msg == WmWtsSessionChange)
+        {
+            var sessionReason = wParam.ToInt32();
+
+            if (sessionReason == WtsSessionLock)
+            {
+                Dispatcher.BeginInvoke(
+                    async () => await HandleSessionLockAsync());
+            }
+            else if (sessionReason == WtsSessionUnlock)
+            {
+                Dispatcher.BeginInvoke(
+                    async () => await HandleSessionUnlockAsync());
+            }
+        }
+
         if (msg == WmHotkey &&
             wParam.ToInt32() == GlobalHotkeyId)
         {
@@ -655,6 +785,11 @@ public partial class MainWindow : Window
 
     private const int WmHotkey = 0x0312;
     private const int WmGetMinMaxInfo = 0x0024;
+    private const int WmWtsSessionChange = 0x02B1;
+
+    private const int WtsSessionLock = 0x7;
+    private const int WtsSessionUnlock = 0x8;
+    private const int NotifyForThisSession = 0;
 
     private const uint ModAlt = 0x0001;
     private const uint ModControl = 0x0002;
@@ -724,6 +859,17 @@ public partial class MainWindow : Window
     private static extern bool GetMonitorInfo(
         IntPtr hMonitor,
         ref MonitorInfo lpmi);
+
+    [DllImport("wtsapi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool WTSRegisterSessionNotification(
+        IntPtr hWnd,
+        int dwFlags);
+
+    [DllImport("wtsapi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool WTSUnRegisterSessionNotification(
+        IntPtr hWnd);
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(
