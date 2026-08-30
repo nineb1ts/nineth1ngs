@@ -1,13 +1,13 @@
-﻿using nineth1ngs.Services;
+using nineth1ngs.Models;
+using nineth1ngs.Services;
 using nineth1ngs.ViewModels;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Input;
 using System.Windows.Media;
-using nineth1ngs.Models;
-using System.Linq;
 
 namespace nineth1ngs;
 
@@ -17,6 +17,7 @@ namespace nineth1ngs;
 public partial class MainWindow : Window
 {
     private readonly WindowSettingsService settingsService;
+    private bool globalHotkeyRegistered;
 
     public MainWindow(
         Th1ngStore store,
@@ -54,9 +55,22 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
 
         var windowHandle = new WindowInteropHelper(this).Handle;
-
         var source = HwndSource.FromHwnd(windowHandle);
+
         source?.AddHook(WindowProc);
+
+        globalHotkeyRegistered = RegisterHotKey(
+            windowHandle,
+            GlobalHotkeyId,
+            ModControl | ModAlt,
+            VirtualKeyN);
+
+        if (!globalHotkeyRegistered)
+        {
+            ShowError(
+                "The global shortcut Ctrl + Alt + N could not be registered.\n\n" +
+                "Another application may already be using it.");
+        }
 
         if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
@@ -70,6 +84,18 @@ public partial class MainWindow : Window
             DwmWindowCornerPreferenceAttribute,
             ref cornerPreference,
             sizeof(int));
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        if (globalHotkeyRegistered)
+        {
+            var windowHandle = new WindowInteropHelper(this).Handle;
+            _ = UnregisterHotKey(windowHandle, GlobalHotkeyId);
+            globalHotkeyRegistered = false;
+        }
+
+        base.OnClosed(e);
     }
 
     private Task<bool> ConfirmDeleteAsync(Models.Th1ng th1ng)
@@ -91,6 +117,52 @@ public partial class MainWindow : Window
         Loaded -= MainWindowLoaded;
 
         await ((MainViewModel)DataContext).LoadAsync();
+    }
+
+    private async void MainWindowClosing(
+        object? sender,
+        System.ComponentModel.CancelEventArgs e)
+    {
+        try
+        {
+            await ((MainViewModel)DataContext).PauseRunningTimersAsync();
+
+            settingsService.Save(new Models.WindowSettings
+            {
+                Width = Width,
+                Height = Height,
+                Left = Left,
+                Top = Top
+            });
+        }
+        catch (Exception exception)
+        {
+            ShowError(
+                $"The application state could not be saved.\n\n{exception.Message}");
+        }
+    }
+
+    private void FocusNewTh1ngInput()
+    {
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.ShowOpenCommand.Execute(null);
+        }
+
+        if (WindowState == WindowState.Minimized)
+        {
+            WindowState = WindowState.Normal;
+        }
+
+        Show();
+        Activate();
+
+        Dispatcher.BeginInvoke(() =>
+        {
+            NewTh1ngTextBox.Focus();
+            Keyboard.Focus(NewTh1ngTextBox);
+            NewTh1ngTextBox.CaretIndex = NewTh1ngTextBox.Text.Length;
+        });
     }
 
     private void TitleBarMouseLeftButtonDown(
@@ -192,7 +264,6 @@ public partial class MainWindow : Window
             return;
         }
 
-        // Klick innerhalb eines aktuell bearbeiteten TextBox -> nichts tun
         if (e.OriginalSource is DependencyObject clickedElement)
         {
             var current = clickedElement;
@@ -228,29 +299,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void MainWindowClosing(
-    object? sender,
-    System.ComponentModel.CancelEventArgs e)
-    {
-        try
-        {
-            await ((MainViewModel)DataContext).PauseRunningTimersAsync();
-
-            settingsService.Save(new Models.WindowSettings
-            {
-                Width = Width,
-                Height = Height,
-                Left = Left,
-                Top = Top
-            });
-        }
-        catch (Exception exception)
-        {
-            ShowError(
-                $"The application state could not be saved.\n\n{exception.Message}");
-        }
-    }
-
     private void EditTextBoxIsVisibleChanged(
         object sender,
         DependencyPropertyChangedEventArgs e)
@@ -273,13 +321,21 @@ public partial class MainWindow : Window
         });
     }
 
-    private static IntPtr WindowProc(
+    private IntPtr WindowProc(
         IntPtr hwnd,
         int msg,
         IntPtr wParam,
         IntPtr lParam,
         ref bool handled)
     {
+        if (msg == WmHotkey &&
+            wParam.ToInt32() == GlobalHotkeyId)
+        {
+            FocusNewTh1ngInput();
+            handled = true;
+            return IntPtr.Zero;
+        }
+
         if (msg == WmGetMinMaxInfo)
         {
             AdjustMaximizedSize(hwnd, lParam);
@@ -338,10 +394,16 @@ public partial class MainWindow : Window
             true);
     }
 
+    private const int GlobalHotkeyId = 9001;
+
+    private const int WmHotkey = 0x0312;
     private const int WmGetMinMaxInfo = 0x0024;
 
-    private const int MonitorDefaultToNearest = 0x00000002;
+    private const uint ModAlt = 0x0001;
+    private const uint ModControl = 0x0002;
+    private const uint VirtualKeyN = 0x4E;
 
+    private const int MonitorDefaultToNearest = 0x00000002;
     private const int DwmWindowCornerPreferenceAttribute = 33;
 
     [StructLayout(LayoutKind.Sequential)]
@@ -378,6 +440,20 @@ public partial class MainWindow : Window
         public Rect rcWork;
         public uint dwFlags;
     }
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool RegisterHotKey(
+        IntPtr hWnd,
+        int id,
+        uint fsModifiers,
+        uint vk);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool UnregisterHotKey(
+        IntPtr hWnd,
+        int id);
 
     [DllImport("user32.dll")]
     private static extern IntPtr MonitorFromWindow(

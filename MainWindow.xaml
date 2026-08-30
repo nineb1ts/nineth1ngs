@@ -1487,7 +1487,7 @@
                                Margin="3,0,0,0"
                                VerticalAlignment="Center"
                                FontFamily="Segoe UI Variable Small"
-                               FontSize="15"
+                               FontSize="16"
                                Foreground="{StaticResource MutedTextBrush}"
                                IsHitTestVisible="False">
                         <TextBlock.Style>
@@ -1509,15 +1509,16 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0"
+                        <TextBox x:Name="NewTh1ngTextBox"
+                                 Grid.Column="0"
                                  Text="{Binding NewTh1ngText,
-                                                UpdateSourceTrigger=PropertyChanged}"
+                                 UpdateSourceTrigger=PropertyChanged}"
                                  VerticalContentAlignment="Center"
                                  Background="Transparent"
                                  BorderThickness="0"
                                  Foreground="{StaticResource PrimaryTextBrush}"
                                  FontFamily="Segoe UI Variable Small"
-                                 FontSize="13"
+                                 FontSize="16"
                                  CaretBrush="{StaticResource AccentBrush}"
                                  ToolTip="Write a new th1ng">
                             <TextBox.InputBindings>
