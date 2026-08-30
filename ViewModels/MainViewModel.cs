@@ -17,8 +17,8 @@ public partial class MainViewModel : ObservableObject
     private readonly TimeFormattingService timeFormattingService = new();
     private readonly TimeCopySettingsService timeCopySettingsService;
     private readonly TimeCopySettings timeCopySettings;
-
     private string previousSection = "th1ngs";
+    public string RoundUpThresholdHint => $"Choose a value from 1 to {BillingIntervalMinutes - 1} minutes.";
 
     public MainViewModel(
         Th1ngStore store,
@@ -32,6 +32,17 @@ public partial class MainViewModel : ObservableObject
         this.showError = showError ?? (_ => { });
 
         timeCopySettings = timeCopySettingsService.Load();
+
+        var maximumThreshold = Math.Max(1, timeCopySettings.BillingIntervalMinutes - 1);
+
+        if (timeCopySettings.RoundUpThresholdMinutes < 1 ||
+            timeCopySettings.RoundUpThresholdMinutes > maximumThreshold)
+        {
+            timeCopySettings.RoundUpThresholdMinutes =
+                Math.Clamp(timeCopySettings.RoundUpThresholdMinutes, 1, maximumThreshold);
+
+            timeCopySettingsService.Save(timeCopySettings);
+        }
 
         timer = new DispatcherTimer
         {
@@ -53,6 +64,9 @@ public partial class MainViewModel : ObservableObject
         45,
         60
     ];
+
+    public IReadOnlyList<int> RoundUpThresholds =>
+        Enumerable.Range(1, BillingIntervalMinutes - 1).ToList();
 
     public IReadOnlyList<TimeOutputFormat> OutputFormats { get; } =
     [
@@ -77,8 +91,20 @@ public partial class MainViewModel : ObservableObject
             }
 
             timeCopySettings.BillingIntervalMinutes = value;
+
+            var maximumThreshold = value - 1;
+
+            if (timeCopySettings.RoundUpThresholdMinutes > maximumThreshold)
+            {
+                timeCopySettings.RoundUpThresholdMinutes = maximumThreshold;
+                OnPropertyChanged(nameof(RoundUpThresholdMinutes));
+            }
+
             timeCopySettingsService.Save(timeCopySettings);
+
             OnPropertyChanged();
+            OnPropertyChanged(nameof(RoundUpThresholds));
+            OnPropertyChanged(nameof(RoundUpThresholdHint));
             OnPropertyChanged(nameof(TimeCopyExample));
         }
     }
@@ -88,6 +114,11 @@ public partial class MainViewModel : ObservableObject
         get => timeCopySettings.RoundUpThresholdMinutes;
         set
         {
+            if (value < 1 || value >= BillingIntervalMinutes)
+            {
+                return;
+            }
+
             if (timeCopySettings.RoundUpThresholdMinutes == value)
             {
                 return;
@@ -117,8 +148,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public string TimeCopyExample =>
-        $"1:39 tracked → {timeFormattingService.FormatForCopy(99 * 60, timeCopySettings)}";
+    public string TimeCopyExample => $"1 h 17 min tracked → {timeFormattingService.FormatForCopy(77 * 60, timeCopySettings)}";
 
     [RelayCommand]
     private void ShowOpen()

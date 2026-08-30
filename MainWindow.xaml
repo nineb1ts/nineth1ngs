@@ -1405,22 +1405,20 @@
                                                VerticalAlignment="Center"
                                                Style="{StaticResource SettingsLabelStyle}"/>
 
-                                    <Grid Grid.Column="1"
-                                          Width="210"
-                                          HorizontalAlignment="Right">
-                                        <TextBox Style="{StaticResource SettingsTextBoxStyle}"
-                                                 Padding="10,6,72,6"
-                                                 Text="{Binding RoundUpThresholdMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                        <TextBlock Margin="0,0,12,0"
-                                                   HorizontalAlignment="Right"
-                                                   VerticalAlignment="Center"
-                                                   Text="minutes"
-                                                   FontFamily="Segoe UI Variable Small"
-                                                   FontSize="13"
-                                                   Foreground="{StaticResource MutedTextBrush}"
-                                                   IsHitTestVisible="False"/>
-                                    </Grid>
+                                    <ComboBox Grid.Column="1"
+                                              Width="210"
+                                              HorizontalAlignment="Right"
+                                              Style="{StaticResource SettingsComboBoxStyle}"
+                                              ItemsSource="{Binding RoundUpThresholds}"
+                                              SelectedItem="{Binding RoundUpThresholdMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding StringFormat={}{0} minutes}"
+                                                           FontFamily="Segoe UI Variable Small"
+                                                           FontSize="14"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
                                 </Grid>
 
                                 <Grid>
