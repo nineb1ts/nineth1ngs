@@ -646,6 +646,7 @@ public partial class MainViewModel : ObservableObject
             {
                 OpenTh1ngs.Remove(th1ng);
                 DoneTh1ngs.Remove(th1ng);
+                th1ngOrderService.Remove(th1ng.Id);
                 SaveOpenOrder();
             }
         }
@@ -720,11 +721,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var insertIndex = OpenTh1ngs
-            .TakeWhile(existing => existing.CreatedAt <= th1ng.CreatedAt)
-            .Count();
-
-        OpenTh1ngs.Insert(insertIndex, th1ng);
+        OpenTh1ngs.Add(th1ng);
     }
 
     private void RefreshSections(Th1ng th1ng)
@@ -732,6 +729,11 @@ public partial class MainViewModel : ObservableObject
         OpenTh1ngs.Remove(th1ng);
         DoneTh1ngs.Remove(th1ng);
         AddToSection(th1ng);
+
+        if (!th1ng.IsCompleted)
+        {
+            ApplySavedOpenOrder();
+        }
     }
 
     public void MoveOpenTh1ng(
