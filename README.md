@@ -10,7 +10,7 @@ I wanted a lightweight place for the small and medium-sized things that come up 
 
 Not a full project management suite.  
 Not a board with ten workflows, labels, assignees, and dashboards.  
-Just a fast way to write something down, keep the important things at the top, break work into smaller steps, and track the time spent on it.
+Just a fast way to write something down, keep the important things in order, break work into smaller steps, and track the time spent on it.
 
 `nineth1ngs` is built around that idea: **reduce the friction between remembering something and actually getting it done.**
 
@@ -21,6 +21,7 @@ Just a fast way to write something down, keep the important things at the top, b
 - **Drag & drop prioritization** — reorder open th1ngs freely
 - **Subth1ngs** — break a th1ng into smaller steps
 - **Built-in timer** — track time directly on a th1ng
+- **Session-aware time tracking** — when Windows is locked, the active timer is paused automatically; after unlocking, the away time can be assigned to a th1ng or discarded
 - **Automatic timer safety** — running timers are paused and saved when the app closes
 - **Copy tracked time** — copy tracked time in a configurable format
 - **Billing-style rounding** — configure interval and round-up threshold
@@ -74,6 +75,8 @@ Click a th1ng to expand it, then use:
 
 to add smaller steps underneath it.
 
+Subth1ngs are kept in creation order, so newer steps are added at the bottom of the list.
+
 ### Edit
 
 Double-click the text of a th1ng or subth1ng to edit it.
@@ -85,7 +88,11 @@ Double-click the text of a th1ng or subth1ng to edit it.
 
 Use the play button next to a th1ng to start its timer.
 
-Only top-level th1ngs track time. When a th1ng is completed or the app closes, a running timer is stopped and its elapsed time is preserved.
+Only top-level th1ngs track time.
+
+When a th1ng is completed or the app closes, a running timer is paused and its elapsed time is preserved.
+
+If Windows is locked while a timer is running, nineth1ngs pauses the timer at the lock time. After unlocking, the timer resumes and the time spent away can be assigned to an open th1ng or discarded.
 
 Click the displayed tracked time to copy it.
 
@@ -97,6 +104,8 @@ The settings page lets you configure how tracked time is copied, including:
 - round-up threshold
 - decimal hours
 - hours and minutes
+
+Any non-zero tracked duration is rounded to at least one billing interval when copied.
 
 This is useful when the tracked time needs to be transferred into another system.
 
@@ -141,7 +150,7 @@ The goal would be useful reflection without turning nineth1ngs into a complex re
 
 ### More ideas
 
-Possible future improvements include better search and filtering, additional keyboard-driven workflows, and further polish around daily use.
+Possible future improvements include better search and filtering, additional keyboard-driven workflows, optional time-tracking visibility, and further polish around daily use.
 
 The guiding rule stays the same: **new features should make the app faster or clearer, not heavier.**
 
