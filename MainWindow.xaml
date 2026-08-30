@@ -821,7 +821,7 @@
                                                        Width="48"
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Variable Small"
-                                                       FontSize="16"
+                                                       FontSize="17"
                                                        FontWeight="SemiBold"
                                                        Foreground="{StaticResource AccentBrush}"
                                                        Cursor="Hand"
