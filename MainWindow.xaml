@@ -1309,11 +1309,14 @@
             <!-- CONTENT                                               -->
             <!-- ===================================================== -->
 
-            <ScrollViewer Grid.Row="2"
+            <ScrollViewer x:Name="ContentScrollViewer"
+                          Grid.Row="2"
                           Padding="18,6,18,8"
                           VerticalScrollBarVisibility="Hidden"
                           HorizontalScrollBarVisibility="Disabled"
-                          CanContentScroll="True">
+                          CanContentScroll="True"
+                          AllowDrop="True"
+                          PreviewDragOver="ContentScrollViewerPreviewDragOver">
                 <Grid>
 
                     <!-- OPEN -->

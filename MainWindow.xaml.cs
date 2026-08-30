@@ -259,6 +259,62 @@ public partial class MainWindow : Window
         ClearDropTarget();
     }
 
+    private void ContentScrollViewerPreviewDragOver(
+        object sender,
+        DragEventArgs e)
+    {
+        if (!e.Data.GetDataPresent(typeof(Th1ng)) ||
+            e.Data.GetData(typeof(Th1ng)) is not Th1ng th1ng ||
+            th1ng.IsCompleted ||
+            th1ng.ParentId.HasValue)
+        {
+            return;
+        }
+
+        var pointer = e.GetPosition(ContentScrollViewer);
+
+        const double scrollZone = 72;
+        const double minimumStep = 4;
+        const double maximumStep = 18;
+
+        if (pointer.Y < scrollZone)
+        {
+            var strength = 1 - Math.Clamp(
+                pointer.Y / scrollZone,
+                0,
+                1);
+
+            var step =
+                minimumStep +
+                ((maximumStep - minimumStep) * strength);
+
+            ContentScrollViewer.ScrollToVerticalOffset(
+                Math.Max(
+                    0,
+                    ContentScrollViewer.VerticalOffset - step));
+        }
+        else if (pointer.Y >
+                 ContentScrollViewer.ActualHeight - scrollZone)
+        {
+            var distanceFromBottom =
+                ContentScrollViewer.ActualHeight - pointer.Y;
+
+            var strength = 1 - Math.Clamp(
+                distanceFromBottom / scrollZone,
+                0,
+                1);
+
+            var step =
+                minimumStep +
+                ((maximumStep - minimumStep) * strength);
+
+            ContentScrollViewer.ScrollToVerticalOffset(
+                Math.Min(
+                    ContentScrollViewer.ScrollableHeight,
+                    ContentScrollViewer.VerticalOffset + step));
+        }
+    }
+
     private void Th1ngCardDragOver(
         object sender,
         DragEventArgs e)
