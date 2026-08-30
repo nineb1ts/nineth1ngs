@@ -18,16 +18,25 @@ public partial class MainWindow : Window
 {
     private readonly WindowSettingsService settingsService;
 
-    public MainWindow(Th1ngStore store, WindowSettingsService settingsService, Models.WindowSettings settings)
+    public MainWindow(
+        Th1ngStore store,
+        WindowSettingsService settingsService,
+        Models.WindowSettings settings)
     {
         InitializeComponent();
+
         this.settingsService = settingsService;
-        DataContext = new MainViewModel(store, ConfirmDeleteAsync, ShowError);
+
+        DataContext = new MainViewModel(
+            store,
+            ConfirmDeleteAsync,
+            ShowError);
+
+        Width = 520;
+        Height = 720;
 
         if (WindowSettingsService.IsValid(settings))
         {
-            Width = settings.Width;
-            Height = settings.Height;
             Left = settings.Left;
             Top = settings.Top;
             WindowStartupLocation = WindowStartupLocation.Manual;
@@ -41,13 +50,18 @@ public partial class MainWindow : Window
     {
         base.OnSourceInitialized(e);
 
+        var windowHandle = new WindowInteropHelper(this).Handle;
+
+        var source = HwndSource.FromHwnd(windowHandle);
+        source?.AddHook(WindowProc);
+
         if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
             return;
         }
 
-        var windowHandle = new WindowInteropHelper(this).Handle;
         var cornerPreference = 2;
+
         _ = DwmSetWindowAttribute(
             windowHandle,
             DwmWindowCornerPreferenceAttribute,
@@ -57,7 +71,9 @@ public partial class MainWindow : Window
 
     private Task<bool> ConfirmDeleteAsync(Models.Th1ng th1ng)
     {
-        var dialog = new Views.DeleteConfirmationWindow(th1ng.Text, th1ng.SubTh1ngs.Count)
+        var dialog = new Views.DeleteConfirmationWindow(
+            th1ng.Text,
+            th1ng.SubTh1ngs.Count)
         {
             Owner = this
         };
@@ -65,13 +81,18 @@ public partial class MainWindow : Window
         return Task.FromResult(dialog.ShowDialog() == true);
     }
 
-    private async void MainWindowLoaded(object sender, RoutedEventArgs e)
+    private async void MainWindowLoaded(
+        object sender,
+        RoutedEventArgs e)
     {
         Loaded -= MainWindowLoaded;
+
         await ((MainViewModel)DataContext).LoadAsync();
     }
 
-    private void MainWindowClosed(object? sender, EventArgs e)
+    private void MainWindowClosed(
+        object? sender,
+        EventArgs e)
     {
         try
         {
@@ -85,11 +106,14 @@ public partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            ShowError($"The window settings could not be saved.\n\n{exception.Message}");
+            ShowError(
+                $"The window settings could not be saved.\n\n{exception.Message}");
         }
     }
 
-    private void TitleBarMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void TitleBarMouseLeftButtonDown(
+        object sender,
+        MouseButtonEventArgs e)
     {
         if (e.ChangedButton != MouseButton.Left)
         {
@@ -105,24 +129,45 @@ public partial class MainWindow : Window
         DragMove();
     }
 
-    private void Th1ngRowMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private void Th1ngRowMouseLeftButtonUp(
+        object sender,
+        MouseButtonEventArgs e)
     {
-        if (e.ClickCount != 1 || IsInteractiveElement(e.OriginalSource as DependencyObject))
+        if (e.ClickCount != 1 ||
+            IsInteractiveElement(e.OriginalSource as DependencyObject))
         {
             return;
         }
 
-        if (sender is Border { DataContext: Models.Th1ng th1ng })
+        if (sender is Border
+            {
+                DataContext: Models.Th1ng th1ng
+            })
         {
             th1ng.IsExpanded = !th1ng.IsExpanded;
         }
     }
 
-    private void MinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+    private void MinimizeClick(
+        object sender,
+        RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
 
-    private void MaximizeClick(object sender, RoutedEventArgs e) => ToggleMaximize();
+    private void MaximizeClick(
+        object sender,
+        RoutedEventArgs e)
+    {
+        ToggleMaximize();
+    }
 
-    private void CloseClick(object sender, RoutedEventArgs e) => Close();
+    private void CloseClick(
+        object sender,
+        RoutedEventArgs e)
+    {
+        Close();
+    }
 
     private void ToggleMaximize()
     {
@@ -131,7 +176,8 @@ public partial class MainWindow : Window
             : WindowState.Maximized;
     }
 
-    private static bool IsInteractiveElement(DependencyObject? source)
+    private static bool IsInteractiveElement(
+        DependencyObject? source)
     {
         while (source is not null)
         {
@@ -155,10 +201,14 @@ public partial class MainWindow : Window
             MessageBoxImage.Error);
     }
 
-    private void WindowPreviewMouseDown(object sender, MouseButtonEventArgs e)
+    private void WindowPreviewMouseDown(
+        object sender,
+        MouseButtonEventArgs e)
     {
         if (DataContext is not MainViewModel viewModel)
+        {
             return;
+        }
 
         // Klick innerhalb eines aktuell bearbeiteten TextBox -> nichts tun
         if (e.OriginalSource is DependencyObject clickedElement)
@@ -186,7 +236,9 @@ public partial class MainWindow : Window
             .FirstOrDefault(sub => sub.IsEditing);
 
         if (editingTh1ng is null)
+        {
             return;
+        }
 
         if (viewModel.SaveEditingCommand.CanExecute(editingTh1ng))
         {
@@ -195,14 +247,18 @@ public partial class MainWindow : Window
     }
 
     private void EditTextBoxIsVisibleChanged(
-    object sender,
-    DependencyPropertyChangedEventArgs e)
+        object sender,
+        DependencyPropertyChangedEventArgs e)
     {
         if (sender is not TextBox textBox)
+        {
             return;
+        }
 
         if (textBox.Visibility != Visibility.Visible)
+        {
             return;
+        }
 
         textBox.Dispatcher.BeginInvoke(() =>
         {
@@ -212,7 +268,124 @@ public partial class MainWindow : Window
         });
     }
 
+    private static IntPtr WindowProc(
+        IntPtr hwnd,
+        int msg,
+        IntPtr wParam,
+        IntPtr lParam,
+        ref bool handled)
+    {
+        if (msg == WmGetMinMaxInfo)
+        {
+            AdjustMaximizedSize(hwnd, lParam);
+            handled = true;
+        }
+
+        return IntPtr.Zero;
+    }
+
+    private static void AdjustMaximizedSize(
+        IntPtr hwnd,
+        IntPtr lParam)
+    {
+        var minMaxInfo =
+            Marshal.PtrToStructure<MinMaxInfo>(lParam);
+
+        var monitor = MonitorFromWindow(
+            hwnd,
+            MonitorDefaultToNearest);
+
+        if (monitor == IntPtr.Zero)
+        {
+            return;
+        }
+
+        var monitorInfo = new MonitorInfo
+        {
+            cbSize = Marshal.SizeOf<MonitorInfo>()
+        };
+
+        if (!GetMonitorInfo(
+                monitor,
+                ref monitorInfo))
+        {
+            return;
+        }
+
+        var workArea = monitorInfo.rcWork;
+        var monitorArea = monitorInfo.rcMonitor;
+
+        minMaxInfo.ptMaxPosition.X =
+            Math.Abs(workArea.Left - monitorArea.Left);
+
+        minMaxInfo.ptMaxPosition.Y =
+            Math.Abs(workArea.Top - monitorArea.Top);
+
+        minMaxInfo.ptMaxSize.X =
+            Math.Abs(workArea.Right - workArea.Left);
+
+        minMaxInfo.ptMaxSize.Y =
+            Math.Abs(workArea.Bottom - workArea.Top);
+
+        Marshal.StructureToPtr(
+            minMaxInfo,
+            lParam,
+            true);
+    }
+
+    private const int WmGetMinMaxInfo = 0x0024;
+
+    private const int MonitorDefaultToNearest = 0x00000002;
+
     private const int DwmWindowCornerPreferenceAttribute = 33;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Point
+    {
+        public int X;
+        public int Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MinMaxInfo
+    {
+        public Point ptReserved;
+        public Point ptMaxSize;
+        public Point ptMaxPosition;
+        public Point ptMinTrackSize;
+        public Point ptMaxTrackSize;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Rect
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MonitorInfo
+    {
+        public int cbSize;
+        public Rect rcMonitor;
+        public Rect rcWork;
+        public uint dwFlags;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromWindow(
+        IntPtr hwnd,
+        int dwFlags);
+
+    [DllImport(
+        "user32.dll",
+        CharSet = CharSet.Auto)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetMonitorInfo(
+        IntPtr hMonitor,
+        ref MonitorInfo lpmi);
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(
