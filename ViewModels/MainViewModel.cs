@@ -720,7 +720,11 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        OpenTh1ngs.Add(th1ng);
+        var insertIndex = OpenTh1ngs
+            .TakeWhile(existing => existing.CreatedAt <= th1ng.CreatedAt)
+            .Count();
+
+        OpenTh1ngs.Insert(insertIndex, th1ng);
     }
 
     private void RefreshSections(Th1ng th1ng)
