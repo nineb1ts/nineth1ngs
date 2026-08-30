@@ -235,7 +235,13 @@ public partial class MainWindow : Window
     {
         while (source is not null)
         {
-            if (source is Button or TextBox or TextBlock)
+            if (source is Button or TextBox)
+            {
+                return true;
+            }
+
+            if (source is TextBlock textBlock &&
+                textBlock.InputBindings.Count > 0)
             {
                 return true;
             }
