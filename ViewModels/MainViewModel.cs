@@ -189,7 +189,7 @@ public partial class MainViewModel : ObservableObject
 
             var topLevelTh1ngs = th1ngs
                 .Where(th1ng => !th1ng.ParentId.HasValue)
-                .OrderByDescending(th1ng => th1ng.CreatedAt)
+                .OrderBy(th1ng => th1ng.CreatedAt)
                 .ToList();
 
             var topLevelIds = topLevelTh1ngs
@@ -204,7 +204,7 @@ public partial class MainViewModel : ObservableObject
                 .ToDictionary(
                     group => group.Key,
                     group => group
-                        .OrderByDescending(th1ng => th1ng.CreatedAt)
+                        .OrderBy(th1ng => th1ng.CreatedAt)
                         .ToList());
 
             foreach (var th1ng in topLevelTh1ngs)
@@ -252,7 +252,7 @@ public partial class MainViewModel : ObservableObject
         {
             await store.AddAsync(th1ng);
 
-            OpenTh1ngs.Insert(0, th1ng);
+            OpenTh1ngs.Add(th1ng);
             SaveOpenOrder();
             NewTh1ngText = string.Empty;
         }
@@ -288,7 +288,7 @@ public partial class MainViewModel : ObservableObject
         {
             await store.AddAsync(subTh1ng);
 
-            parent.SubTh1ngs.Insert(0, subTh1ng);
+            parent.SubTh1ngs.Add(subTh1ng);
             parent.NewSubTh1ngText = string.Empty;
             parent.IsAddingSubTh1ng = false;
             parent.IsExpanded = true;
