@@ -82,12 +82,12 @@
         <Style x:Key="OpenSectionVisibilityStyle"
                TargetType="Grid">
             <Setter Property="Visibility"
-                    Value="Visible"/>
+                    Value="Collapsed"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding SelectedSection}"
-                             Value="done">
+                             Value="th1ngs">
                     <Setter Property="Visibility"
-                            Value="Collapsed"/>
+                            Value="Visible"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -103,6 +103,270 @@
                             Value="Visible"/>
                 </DataTrigger>
             </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SettingsSectionVisibilityStyle"
+               TargetType="Grid">
+            <Setter Property="Visibility"
+                    Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedSection}"
+                             Value="settings">
+                    <Setter Property="Visibility"
+                            Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="MainNavigationVisibilityStyle"
+               TargetType="Grid">
+            <Setter Property="Visibility"
+                    Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedSection}"
+                             Value="settings">
+                    <Setter Property="Visibility"
+                            Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SettingsNavigationVisibilityStyle"
+               TargetType="Grid">
+            <Setter Property="Visibility"
+                    Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedSection}"
+                             Value="settings">
+                    <Setter Property="Visibility"
+                            Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="AddTh1ngAreaVisibilityStyle"
+               TargetType="Border">
+            <Setter Property="Visibility"
+                    Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedSection}"
+                             Value="settings">
+                    <Setter Property="Visibility"
+                            Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SettingsLabelStyle"
+               TargetType="TextBlock">
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable Small"/>
+            <Setter Property="FontSize"
+                    Value="12"/>
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource SecondaryTextBrush}"/>
+        </Style>
+
+        <Style x:Key="SettingsComboBoxItemStyle"
+               TargetType="ComboBoxItem">
+            <Setter Property="Padding"
+                    Value="10,7"/>
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable Small"/>
+            <Setter Property="FontSize"
+                    Value="14"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="Background"
+                    Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Stretch"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted"
+                         Value="True">
+                    <Setter Property="Background"
+                            Value="{StaticResource SurfaceHoverBrush}"/>
+                </Trigger>
+                <Trigger Property="IsSelected"
+                         Value="True">
+                    <Setter Property="Foreground"
+                            Value="{StaticResource AccentBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SettingsComboBoxStyle"
+               TargetType="ComboBox">
+            <Setter Property="Height"
+                    Value="38"/>
+            <Setter Property="Padding"
+                    Value="10,4"/>
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable Small"/>
+            <Setter Property="FontSize"
+                    Value="14"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="Background"
+                    Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="ItemContainerStyle"
+                    Value="{StaticResource SettingsComboBoxItemStyle}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="ComboBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="7">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="32"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <ContentPresenter Grid.Column="0"
+                                                      Margin="{TemplateBinding Padding}"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Left"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                      TextElement.Foreground="{TemplateBinding Foreground}"/>
+
+                                    <Path Grid.Column="1"
+                                          Width="8"
+                                          Height="5"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Fill="{StaticResource SecondaryTextBrush}"
+                                          Data="M 0,0 L 4,4 L 8,0 Z"/>
+                                </Grid>
+                            </Border>
+
+                            <ToggleButton Background="Transparent"
+                                          BorderThickness="0"
+                                          Focusable="False"
+                                          ClickMode="Press"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="Transparent"/>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   PopupAnimation="Fade">
+                                <Border Margin="0,4,0,0"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Background="{StaticResource SurfaceBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="7">
+                                    <ScrollViewer MaxHeight="260"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="ComboBorder"
+                                        Property="Background"
+                                        Value="{StaticResource SurfaceHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin"
+                                     Value="True">
+                                <Setter TargetName="ComboBorder"
+                                        Property="BorderBrush"
+                                        Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SettingsTextBoxStyle"
+               TargetType="TextBox">
+            <Setter Property="Height"
+                    Value="38"/>
+            <Setter Property="Padding"
+                    Value="10,6"/>
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Variable Small"/>
+            <Setter Property="FontSize"
+                    Value="14"/>
+            <Setter Property="Foreground"
+                    Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="Background"
+                    Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="CaretBrush"
+                    Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="TextBoxBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="7">
+
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Margin="10,0,72,0"
+                                              VerticalAlignment="Center"/>
+
+                                <TextBlock Margin="0,0,12,0"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Text="minutes"
+                                           FontFamily="Segoe UI Variable Small"
+                                           FontSize="13"
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           IsHitTestVisible="False"/>
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="TextBoxBorder"
+                                        Property="Background"
+                                        Value="{StaticResource SurfaceHoverBrush}"/>
+                            </Trigger>
+
+                            <Trigger Property="IsKeyboardFocusWithin"
+                                     Value="True">
+                                <Setter TargetName="TextBoxBorder"
+                                        Property="BorderBrush"
+                                        Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- ========================================================= -->
@@ -900,44 +1164,122 @@
 
             <Grid Grid.Row="1"
                   Margin="18,0">
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center">
 
-                    <Button Command="{Binding ShowOpenCommand}"
-                            Style="{StaticResource OpenSectionButtonStyle}"
-                            ToolTip="Show open th1ngs">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="TH1NGS"
-                                       FontSize="14"
-                                       FontWeight="SemiBold"
-                                       Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
-                            <TextBlock Text="  ·  "
-                                       FontSize="12"
-                                       Foreground="{StaticResource MutedTextBrush}"/>
-                            <TextBlock Text="{Binding OpenTh1ngs.Count}"
-                                       FontSize="13"
-                                       Foreground="{StaticResource MutedTextBrush}"/>
-                        </StackPanel>
-                    </Button>
+                <!-- TH1NGS / DONE / SETTINGS BUTTON -->
 
-                    <Button Command="{Binding ShowDoneCommand}"
-                            Style="{StaticResource DoneSectionButtonStyle}"
-                            ToolTip="Show completed th1ngs">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="DONE"
-                                       FontSize="14"
-                                       FontWeight="SemiBold"
-                                       Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
-                            <TextBlock Text="  ·  "
-                                       FontSize="12"
-                                       Foreground="{StaticResource MutedTextBrush}"/>
-                            <TextBlock Text="{Binding DoneTh1ngs.Count}"
-                                       FontSize="13"
-                                       Foreground="{StaticResource MutedTextBrush}"/>
-                        </StackPanel>
+                <Grid Style="{StaticResource MainNavigationVisibilityStyle}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+
+                        <Button Command="{Binding ShowOpenCommand}"
+                                Style="{StaticResource OpenSectionButtonStyle}"
+                                ToolTip="Show open th1ngs">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="TH1NGS"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                                <TextBlock Text="  ·  "
+                                           FontSize="12"
+                                           Foreground="{StaticResource MutedTextBrush}"/>
+                                <TextBlock Text="{Binding OpenTh1ngs.Count}"
+                                           FontSize="13"
+                                           Foreground="{StaticResource MutedTextBrush}"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Command="{Binding ShowDoneCommand}"
+                                Style="{StaticResource DoneSectionButtonStyle}"
+                                ToolTip="Show completed th1ngs">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="DONE"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                                <TextBlock Text="  ·  "
+                                           FontSize="12"
+                                           Foreground="{StaticResource MutedTextBrush}"/>
+                                <TextBlock Text="{Binding DoneTh1ngs.Count}"
+                                           FontSize="13"
+                                           Foreground="{StaticResource MutedTextBrush}"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Command="{Binding ShowSettingsCommand}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource IconButtonStyle}"
+                            ToolTip="Settings">
+                        <TextBlock Text="⚙"
+                                   FontFamily="Segoe UI Symbol"
+                                   FontSize="17"/>
                     </Button>
-                </StackPanel>
+                </Grid>
+
+                <!-- SETTINGS HEADER -->
+
+                <Grid Style="{StaticResource SettingsNavigationVisibilityStyle}"
+                      Height="38"
+                      VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <Button Width="30"
+                                Height="30"
+                                Command="{Binding BackFromSettingsCommand}"
+                                Cursor="Hand"
+                                FocusVisualStyle="{x:Null}"
+                                ToolTip="Back">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="BackBorder"
+                                            Width="30"
+                                            Height="30"
+                                            Background="Transparent"
+                                            CornerRadius="8">
+                                        <Grid>
+                                            <Path Data="M 10,4 L 5,8 L 10,12"
+                                                  Width="10"
+                                                  Height="16"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Stretch="Uniform"
+                                                  Stroke="{StaticResource SecondaryTextBrush}"
+                                                  StrokeThickness="1.6"
+                                                  StrokeStartLineCap="Round"
+                                                  StrokeEndLineCap="Round"
+                                                  StrokeLineJoin="Round"/>
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver"
+                                                 Value="True">
+                                            <Setter TargetName="BackBorder"
+                                                    Property="Background"
+                                                    Value="{StaticResource SurfaceHoverBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <TextBlock Text="SETTINGS"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Segoe UI Variable Small"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource PrimaryTextBrush}"/>
+                    </StackPanel>
+                </Grid>
             </Grid>
 
             <!-- ===================================================== -->
@@ -1004,6 +1346,125 @@
                         <ItemsControl ItemsSource="{Binding DoneTh1ngs}"
                                       ItemTemplate="{StaticResource Th1ngTemplate}"/>
                     </Grid>
+
+                    <!-- SETTINGS -->
+
+                    <Grid Style="{StaticResource SettingsSectionVisibilityStyle}">
+                        <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="2,12,2,20">
+
+                                <TextBlock Text="Time tracking"
+                                           FontFamily="Segoe UI Variable Display"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryTextBrush}"/>
+
+                                <TextBlock Margin="0,6,0,22"
+                                           Text="Choose how tracked time is rounded and copied."
+                                           TextWrapping="Wrap"
+                                           FontFamily="Segoe UI Variable Small"
+                                           FontSize="13"
+                                           Foreground="{StaticResource MutedTextBrush}"/>
+
+                                <Grid Margin="0,0,0,14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="Billing interval"
+                                               VerticalAlignment="Center"
+                                               Style="{StaticResource SettingsLabelStyle}"/>
+
+                                    <ComboBox Grid.Column="1"
+                                              Width="210"
+                                              HorizontalAlignment="Right"
+                                              Style="{StaticResource SettingsComboBoxStyle}"
+                                              ItemsSource="{Binding BillingIntervals}"
+                                              SelectedItem="{Binding BillingIntervalMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding StringFormat={}{0} minutes}"
+                                                           FontFamily="Segoe UI Variable Small"
+                                                           FontSize="14"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="Round up after"
+                                               VerticalAlignment="Center"
+                                               Style="{StaticResource SettingsLabelStyle}"/>
+
+                                    <Grid Grid.Column="1"
+                                          Width="210"
+                                          HorizontalAlignment="Right">
+                                        <TextBox Style="{StaticResource SettingsTextBoxStyle}"
+                                                 Padding="10,6,72,6"
+                                                 Text="{Binding RoundUpThresholdMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                        <TextBlock Margin="0,0,12,0"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Text="minutes"
+                                                   FontFamily="Segoe UI Variable Small"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource MutedTextBrush}"
+                                                   IsHitTestVisible="False"/>
+                                    </Grid>
+                                </Grid>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="Time format"
+                                               VerticalAlignment="Center"
+                                               Style="{StaticResource SettingsLabelStyle}"/>
+
+                                    <ComboBox Grid.Column="1"
+                                              Width="210"
+                                              HorizontalAlignment="Right"
+                                              Style="{StaticResource SettingsComboBoxStyle}"
+                                              ItemsSource="{Binding OutputFormats}"
+                                              SelectedItem="{Binding OutputFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+
+                                <Border Margin="0,24,0,0"
+                                        Padding="12"
+                                        Background="{StaticResource SurfaceBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                    <StackPanel>
+                                        <TextBlock Text="Example"
+                                                   FontFamily="Segoe UI Variable Small"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+
+                                        <TextBlock Margin="0,6,0,0"
+                                                   Text="{Binding TimeCopyExample}"
+                                                   FontFamily="Segoe UI Variable Small"
+                                                   FontSize="14"
+                                                   Foreground="{StaticResource PrimaryTextBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
                 </Grid>
             </ScrollViewer>
 
@@ -1015,6 +1476,7 @@
                     Margin="18,6,18,10"
                     Padding="10,4,6,4"
                     Background="{StaticResource SurfaceBrush}"
+                    Style="{StaticResource AddTh1ngAreaVisibilityStyle}"
                     BorderBrush="{StaticResource BorderBrush}"
                     BorderThickness="1"
                     CornerRadius="8">

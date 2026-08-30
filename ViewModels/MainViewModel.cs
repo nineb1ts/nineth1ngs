@@ -18,6 +18,8 @@ public partial class MainViewModel : ObservableObject
     private readonly TimeCopySettingsService timeCopySettingsService;
     private readonly TimeCopySettings timeCopySettings;
 
+    private string previousSection = "th1ngs";
+
     public MainViewModel(
         Th1ngStore store,
         TimeCopySettingsService timeCopySettingsService,
@@ -44,11 +46,79 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<Th1ng> DoneTh1ngs { get; } = [];
 
+    public IReadOnlyList<int> BillingIntervals { get; } =
+    [
+        15,
+        30,
+        45,
+        60
+    ];
+
+    public IReadOnlyList<TimeOutputFormat> OutputFormats { get; } =
+    [
+        TimeOutputFormat.DecimalHours,
+        TimeOutputFormat.HoursAndMinutes
+    ];
+
     [ObservableProperty]
     private string newTh1ngText = string.Empty;
 
     [ObservableProperty]
     private string selectedSection = "th1ngs";
+
+    public int BillingIntervalMinutes
+    {
+        get => timeCopySettings.BillingIntervalMinutes;
+        set
+        {
+            if (timeCopySettings.BillingIntervalMinutes == value)
+            {
+                return;
+            }
+
+            timeCopySettings.BillingIntervalMinutes = value;
+            timeCopySettingsService.Save(timeCopySettings);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(TimeCopyExample));
+        }
+    }
+
+    public int RoundUpThresholdMinutes
+    {
+        get => timeCopySettings.RoundUpThresholdMinutes;
+        set
+        {
+            if (timeCopySettings.RoundUpThresholdMinutes == value)
+            {
+                return;
+            }
+
+            timeCopySettings.RoundUpThresholdMinutes = value;
+            timeCopySettingsService.Save(timeCopySettings);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(TimeCopyExample));
+        }
+    }
+
+    public TimeOutputFormat OutputFormat
+    {
+        get => timeCopySettings.OutputFormat;
+        set
+        {
+            if (timeCopySettings.OutputFormat == value)
+            {
+                return;
+            }
+
+            timeCopySettings.OutputFormat = value;
+            timeCopySettingsService.Save(timeCopySettings);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(TimeCopyExample));
+        }
+    }
+
+    public string TimeCopyExample =>
+        $"1:39 tracked → {timeFormattingService.FormatForCopy(99 * 60, timeCopySettings)}";
 
     [RelayCommand]
     private void ShowOpen()
@@ -62,11 +132,25 @@ public partial class MainViewModel : ObservableObject
         SelectedSection = "done";
     }
 
+    [RelayCommand]
+    private void ShowSettings()
+    {
+        previousSection = SelectedSection;
+        SelectedSection = "settings";
+    }
+
+    [RelayCommand]
+    private void BackFromSettings()
+    {
+        SelectedSection = previousSection;
+    }
+
     public async Task LoadAsync()
     {
         try
         {
             var th1ngs = await store.LoadAsync();
+
             OpenTh1ngs.Clear();
             DoneTh1ngs.Clear();
 
@@ -80,15 +164,21 @@ public partial class MainViewModel : ObservableObject
                 .ToHashSet();
 
             var subTh1ngsByParent = th1ngs
-                .Where(th1ng => th1ng.ParentId.HasValue && topLevelIds.Contains(th1ng.ParentId.Value))
+                .Where(th1ng =>
+                    th1ng.ParentId.HasValue &&
+                    topLevelIds.Contains(th1ng.ParentId.Value))
                 .GroupBy(th1ng => th1ng.ParentId!.Value)
                 .ToDictionary(
                     group => group.Key,
-                    group => group.OrderByDescending(th1ng => th1ng.CreatedAt).ToList());
+                    group => group
+                        .OrderByDescending(th1ng => th1ng.CreatedAt)
+                        .ToList());
 
             foreach (var th1ng in topLevelTh1ngs)
             {
-                if (subTh1ngsByParent.TryGetValue(th1ng.Id, out var subTh1ngs))
+                if (subTh1ngsByParent.TryGetValue(
+                        th1ng.Id,
+                        out var subTh1ngs))
                 {
                     foreach (var subTh1ng in subTh1ngs)
                     {
@@ -101,7 +191,9 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            ReportError("The th1ngs could not be loaded from local storage.", exception);
+            ReportError(
+                "The th1ngs could not be loaded from local storage.",
+                exception);
         }
     }
 
@@ -109,6 +201,7 @@ public partial class MainViewModel : ObservableObject
     private async Task AddTh1ngAsync()
     {
         var text = NewTh1ngText.Trim();
+
         if (text.Length == 0)
         {
             return;
@@ -123,6 +216,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.AddAsync(th1ng);
+
             OpenTh1ngs.Insert(0, th1ng);
             NewTh1ngText = string.Empty;
         }
@@ -141,6 +235,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         var text = parent.NewSubTh1ngText.Trim();
+
         if (text.Length == 0)
         {
             return;
@@ -156,6 +251,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.AddAsync(subTh1ng);
+
             parent.SubTh1ngs.Insert(0, subTh1ng);
             parent.NewSubTh1ngText = string.Empty;
             parent.IsAddingSubTh1ng = false;
@@ -165,6 +261,93 @@ public partial class MainViewModel : ObservableObject
         {
             ReportError("The sub-th1ng could not be saved.", exception);
         }
+    }
+
+    [RelayCommand]
+    private void BeginEditing(Th1ng th1ng)
+    {
+        if (SelectedSection == "done")
+        {
+            return;
+        }
+
+        th1ng.EditText = th1ng.Text;
+        th1ng.IsEditing = true;
+    }
+
+    [RelayCommand]
+    private async Task SaveEditingAsync(Th1ng th1ng)
+    {
+        if (SelectedSection == "done")
+        {
+            th1ng.EditText = th1ng.Text;
+            th1ng.IsEditing = false;
+            return;
+        }
+
+        var text = th1ng.EditText.Trim();
+
+        if (text.Length == 0 && th1ng.ParentId.HasValue)
+        {
+            try
+            {
+                await store.DeleteAsync(th1ng);
+                FindParent(th1ng)?.SubTh1ngs.Remove(th1ng);
+            }
+            catch (Exception exception)
+            {
+                ReportError(
+                    "The sub-th1ng could not be deleted.",
+                    exception);
+            }
+
+            return;
+        }
+
+        if (text.Length == 0)
+        {
+            return;
+        }
+
+        var previousText = th1ng.Text;
+        th1ng.Text = text;
+
+        try
+        {
+            await store.UpdateAsync(th1ng);
+            th1ng.IsEditing = false;
+        }
+        catch
+        {
+            th1ng.Text = previousText;
+            ReportError("The edited th1ng could not be saved.");
+        }
+    }
+
+    [RelayCommand]
+    private static void CancelEditing(Th1ng th1ng)
+    {
+        th1ng.EditText = th1ng.Text;
+        th1ng.IsEditing = false;
+    }
+
+    [RelayCommand]
+    private void BeginAddSubTh1ng(Th1ng parent)
+    {
+        if (SelectedSection == "done" || parent.ParentId.HasValue)
+        {
+            return;
+        }
+
+        parent.IsExpanded = true;
+        parent.IsAddingSubTh1ng = true;
+    }
+
+    [RelayCommand]
+    private static void CancelAddSubTh1ng(Th1ng parent)
+    {
+        parent.NewSubTh1ngText = string.Empty;
+        parent.IsAddingSubTh1ng = false;
     }
 
     [RelayCommand]
@@ -209,6 +392,56 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task ToggleTimerAsync(Th1ng th1ng)
+    {
+        if (th1ng.ParentId.HasValue || th1ng.IsCompleted)
+        {
+            return;
+        }
+
+        if (th1ng.IsTimerRunning)
+        {
+            _ = await PauseTimerAsync(th1ng);
+            return;
+        }
+
+        foreach (var runningTh1ng in OpenTh1ngs
+                     .Concat(DoneTh1ngs)
+                     .Where(candidate =>
+                         candidate.IsTimerRunning &&
+                         !ReferenceEquals(candidate, th1ng)))
+        {
+            if (!await PauseTimerAsync(runningTh1ng))
+            {
+                return;
+            }
+        }
+
+        var previousTimerStartedAt = th1ng.TimerStartedAt;
+        th1ng.TimerStartedAt = DateTime.UtcNow;
+
+        try
+        {
+            await store.UpdateAsync(th1ng);
+        }
+        catch (Exception exception)
+        {
+            th1ng.TimerStartedAt = previousTimerStartedAt;
+            ReportError("The timer could not be started.", exception);
+        }
+    }
+
+    public async Task PauseRunningTimersAsync()
+    {
+        foreach (var th1ng in OpenTh1ngs
+                     .Concat(DoneTh1ngs)
+                     .Where(th1ng => th1ng.IsTimerRunning))
+        {
+            await PauseTimerAsync(th1ng);
+        }
+    }
+
+    [RelayCommand]
     private async Task CopyTrackedTimeAsync(Th1ng th1ng)
     {
         try
@@ -231,44 +464,9 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            ReportError("The tracked time could not be copied.", exception);
-        }
-    }
-
-    [RelayCommand]
-    private async Task ToggleTimerAsync(Th1ng th1ng)
-    {
-        if (th1ng.ParentId.HasValue || th1ng.IsCompleted)
-        {
-            return;
-        }
-
-        if (th1ng.IsTimerRunning)
-        {
-            _ = await PauseTimerAsync(th1ng);
-            return;
-        }
-
-        foreach (var runningTh1ng in OpenTh1ngs.Concat(DoneTh1ngs)
-                     .Where(candidate => candidate.IsTimerRunning && !ReferenceEquals(candidate, th1ng)))
-        {
-            if (!await PauseTimerAsync(runningTh1ng))
-            {
-                return;
-            }
-        }
-
-        var previousTimerStartedAt = th1ng.TimerStartedAt;
-        th1ng.TimerStartedAt = DateTime.UtcNow;
-
-        try
-        {
-            await store.UpdateAsync(th1ng);
-        }
-        catch (Exception exception)
-        {
-            th1ng.TimerStartedAt = previousTimerStartedAt;
-            ReportError("The timer could not be started.", exception);
+            ReportError(
+                "The tracked time could not be copied.",
+                exception);
         }
     }
 
@@ -286,7 +484,9 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            ReportError("The th1ng text could not be copied.", exception);
+            ReportError(
+                "The th1ng text could not be copied.",
+                exception);
         }
     }
 
@@ -333,93 +533,44 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            ReportError("The sub-th1ng could not be deleted.", exception);
+            ReportError(
+                "The sub-th1ng could not be deleted.",
+                exception);
         }
     }
 
-    [RelayCommand]
-    private void BeginEditing(Th1ng th1ng)
+    private async Task<bool> PauseTimerAsync(Th1ng th1ng)
     {
-        if (SelectedSection == "done")
-        {
-            return;
-        }
+        var previousElapsedSeconds = th1ng.ElapsedSeconds;
+        var previousTimerStartedAt = th1ng.TimerStartedAt;
 
-        th1ng.EditText = th1ng.Text;
-        th1ng.IsEditing = true;
-    }
-
-    [RelayCommand]
-    private void BeginAddSubTh1ng(Th1ng parent)
-    {
-        if (SelectedSection == "done" || parent.ParentId.HasValue)
-        {
-            return;
-        }
-
-        parent.IsExpanded = true;
-        parent.IsAddingSubTh1ng = true;
-    }
-
-    [RelayCommand]
-    private static void CancelAddSubTh1ng(Th1ng parent)
-    {
-        parent.NewSubTh1ngText = string.Empty;
-        parent.IsAddingSubTh1ng = false;
-    }
-
-    [RelayCommand]
-    private async Task SaveEditingAsync(Th1ng th1ng)
-    {
-        if (SelectedSection == "done")
-        {
-            th1ng.EditText = th1ng.Text;
-            th1ng.IsEditing = false;
-            return;
-        }
-
-        var text = th1ng.EditText.Trim();
-
-        if (text.Length == 0 && th1ng.ParentId.HasValue)
-        {
-            try
-            {
-                await store.DeleteAsync(th1ng);
-                FindParent(th1ng)?.SubTh1ngs.Remove(th1ng);
-            }
-            catch (Exception exception)
-            {
-                ReportError("The sub-th1ng could not be deleted.", exception);
-            }
-
-            return;
-        }
-
-        if (text.Length == 0)
-        {
-            return;
-        }
-
-        var previousText = th1ng.Text;
-        th1ng.Text = text;
+        th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds();
+        th1ng.TimerStartedAt = null;
 
         try
         {
             await store.UpdateAsync(th1ng);
-            th1ng.IsEditing = false;
+            return true;
         }
-        catch
+        catch (Exception exception)
         {
-            th1ng.Text = previousText;
-            ReportError("The edited th1ng could not be saved.");
+            th1ng.ElapsedSeconds = previousElapsedSeconds;
+            th1ng.TimerStartedAt = previousTimerStartedAt;
+
+            ReportError("The timer could not be paused.", exception);
+            return false;
         }
     }
 
-    [RelayCommand]
-    private static void CancelEditing(Th1ng th1ng)
+    private void TimerTick(object? sender, EventArgs e)
     {
-        th1ng.EditText = th1ng.Text;
-        th1ng.IsEditing = false;
+        foreach (var th1ng in OpenTh1ngs.Concat(DoneTh1ngs))
+        {
+            if (th1ng.IsTimerRunning)
+            {
+                th1ng.RefreshTimerDisplay();
+            }
+        }
     }
 
     private void AddToSection(Th1ng th1ng)
@@ -440,7 +591,15 @@ public partial class MainViewModel : ObservableObject
         AddToSection(th1ng);
     }
 
-    private void ReportError(string message, Exception? exception = null)
+    private Th1ng? FindParent(Th1ng subTh1ng) =>
+        OpenTh1ngs
+            .Concat(DoneTh1ngs)
+            .FirstOrDefault(parent =>
+                parent.SubTh1ngs.Contains(subTh1ng));
+
+    private void ReportError(
+        string message,
+        Exception? exception = null)
     {
         var details = exception is null
             ? string.Empty
@@ -448,51 +607,4 @@ public partial class MainViewModel : ObservableObject
 
         showError($"{message}{details}");
     }
-
-    private async Task<bool> PauseTimerAsync(Th1ng th1ng)
-    {
-        var previousElapsedSeconds = th1ng.ElapsedSeconds;
-        var previousTimerStartedAt = th1ng.TimerStartedAt;
-
-        th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds();
-        th1ng.TimerStartedAt = null;
-
-        try
-        {
-            await store.UpdateAsync(th1ng);
-            return true;
-        }
-        catch (Exception exception)
-        {
-            th1ng.ElapsedSeconds = previousElapsedSeconds;
-            th1ng.TimerStartedAt = previousTimerStartedAt;
-            ReportError("The timer could not be paused.", exception);
-            return false;
-        }
-    }
-
-    public async Task PauseRunningTimersAsync()
-    {
-        foreach (var th1ng in OpenTh1ngs.Concat(DoneTh1ngs)
-                     .Where(th1ng => th1ng.IsTimerRunning))
-        {
-            await PauseTimerAsync(th1ng);
-        }
-    }
-
-    private void TimerTick(object? sender, EventArgs e)
-    {
-        foreach (var th1ng in OpenTh1ngs.Concat(DoneTh1ngs))
-        {
-            if (th1ng.IsTimerRunning)
-            {
-                th1ng.RefreshTimerDisplay();
-            }
-        }
-    }
-
-    private Th1ng? FindParent(Th1ng subTh1ng) =>
-        OpenTh1ngs
-            .Concat(DoneTh1ngs)
-            .FirstOrDefault(parent => parent.SubTh1ngs.Contains(subTh1ng));
 }
