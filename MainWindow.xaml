@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
-        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:services="clr-namespace:nineth1ngs.Services"
         mc:Ignorable="d"
         Title="nineth1ngs"
@@ -32,6 +31,55 @@
     <Window.Resources>
 
         <services:TimestampDisplayConverter x:Key="TimestampConverter"/>
+
+        <!-- Feather icon geometries (24x24 viewBox) -->
+        <GeometryGroup x:Key="FeatherListGeometry">
+            <PathGeometry Figures="M8,6 L21,6 M8,12 L21,12 M8,18 L21,18"/>
+            <EllipseGeometry Center="3,6" RadiusX="0.75" RadiusY="0.75"/>
+            <EllipseGeometry Center="3,12" RadiusX="0.75" RadiusY="0.75"/>
+            <EllipseGeometry Center="3,18" RadiusX="0.75" RadiusY="0.75"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherCheckCircleGeometry">
+            <EllipseGeometry Center="12,12" RadiusX="9" RadiusY="9"/>
+            <PathGeometry Figures="M8,12 L11,15 L16,9"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherSettingsGeometry">
+            <EllipseGeometry Center="12,12" RadiusX="3" RadiusY="3"/>
+            <PathGeometry Figures="M19.4,15 A1.65,1.65 0 0 0 19.73,16.82 L19.79,16.88 A2,2 0 1 1 16.96,19.71 L16.9,19.65 A1.65,1.65 0 0 0 15.08,19.32 A1.65,1.65 0 0 0 14,20.83 L14,21 A2,2 0 1 1 10,21 L10,20.91 A1.65,1.65 0 0 0 8.92,19.4 A1.65,1.65 0 0 0 7.1,19.73 L7.04,19.79 A2,2 0 1 1 4.21,16.96 L4.27,16.9 A1.65,1.65 0 0 0 4.6,15.08 A1.65,1.65 0 0 0 3.09,14 L3,14 A2,2 0 1 1 3,10 L3.09,10 A1.65,1.65 0 0 0 4.6,8.92 A1.65,1.65 0 0 0 4.27,7.1 L4.21,7.04 A2,2 0 1 1 7.04,4.21 L7.1,4.27 A1.65,1.65 0 0 0 8.92,4.6 L10,4.6 L10,3 A2,2 0 1 1 14,3 L14,3.09 A1.65,1.65 0 0 0 15.08,4.6 A1.65,1.65 0 0 0 16.9,4.27 L16.96,4.21 A2,2 0 1 1 19.79,7.04 L19.73,7.1 A1.65,1.65 0 0 0 19.4,8.92 A1.65,1.65 0 0 0 20.91,10 L21,10 A2,2 0 1 1 21,14 L20.91,14 A1.65,1.65 0 0 0 19.4,15 Z"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherChevronLeftGeometry">
+            <PathGeometry Figures="M15,18 L9,12 L15,6"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherCheckGeometry">
+            <PathGeometry Figures="M20,6 L9,17 L4,12"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherRotateCcwGeometry">
+            <PathGeometry Figures="M1,4 L1,10 L7,10 M3.51,15 A9,9 0 1 0 5.64,5.64 L1,10"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherCopyGeometry">
+            <RectangleGeometry Rect="9,9,13,13" RadiusX="2" RadiusY="2"/>
+            <PathGeometry Figures="M5,15 L4,15 A2,2 0 0 1 2,13 L2,4 A2,2 0 0 1 4,2 L13,2 A2,2 0 0 1 15,4 L15,5"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherTrashGeometry">
+            <PathGeometry Figures="M3,6 L5,6 L21,6 M8,6 L8,4 A2,2 0 0 1 10,2 L14,2 A2,2 0 0 1 16,4 L16,6 M19,6 L18,21 A2,2 0 0 1 16,23 L8,23 A2,2 0 0 1 6,21 L5,6 M10,11 L10,17 M14,11 L14,17"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherPlayGeometry">
+            <PathGeometry Figures="M5,3 L19,12 L5,21 Z"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherPauseGeometry">
+            <RectangleGeometry Rect="6,4,4,16" RadiusX="1" RadiusY="1"/>
+            <RectangleGeometry Rect="14,4,4,16" RadiusX="1" RadiusY="1"/>
+        </GeometryGroup>
+
 
         <Style x:Key="OpenSectionButtonStyle"
                BasedOn="{StaticResource SectionButtonStyle}"
@@ -478,14 +526,12 @@
                             ToolTip="Complete or reopen sub-th1ng">
                         <Grid Width="15"
                               Height="15">
-                            <Path Data="{StaticResource CheckGeometry}"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.6"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round">
-                                <Path.Style>
-                                    <Style TargetType="Path">
+                            <Viewbox Width="15"
+                                          Height="15"
+                                          Stretch="Uniform">
+                                <Viewbox.Style>
+                                    <Style TargetType="Viewbox">
+                                        
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsCompleted}"
                                                          Value="True">
@@ -494,23 +540,22 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </Path.Style>
-                            </Path>
-                            <Path Data="{StaticResource ReopenArrowGeometry}"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.5"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round"
-                                  RenderTransformOrigin="0.5,0.5">
-                                <Path.RenderTransform>
-                                    <ScaleTransform ScaleX="1.18"
-                                                    ScaleY="1.18"/>
-                                </Path.RenderTransform>
-                                <Path.Style>
-                                    <Style TargetType="Path">
-                                        <Setter Property="Visibility"
-                                                Value="Collapsed"/>
+                                </Viewbox.Style>
+                                <Path Data="{StaticResource FeatherCheckGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
+
+                            <Viewbox Width="15"
+                                          Height="15"
+                                          Stretch="Uniform">
+                                <Viewbox.Style>
+                                    <Style TargetType="Viewbox">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsCompleted}"
                                                          Value="True">
@@ -519,8 +564,15 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </Path.Style>
-                            </Path>
+                                </Viewbox.Style>
+                                <Path Data="{StaticResource FeatherRotateCcwGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
                         </Grid>
                     </Button>
 
@@ -528,29 +580,34 @@
                             Command="{Binding DataContext.CopyTh1ngTextCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                             CommandParameter="{Binding}"
                             ToolTip="Copy sub-th1ng text">
-                        <Grid Width="15"
-                              Height="15">
-                            <Path Data="M 5,2 L 12,2 L 12,9 L 10.5,9 L 10.5,3.5 L 5,3.5 Z"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.25"
-                                  StrokeLineJoin="Round"/>
-                            <Path Data="M 2,5 L 9,5 L 9,12 L 2,12 Z"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.25"
-                                  StrokeLineJoin="Round"/>
-                        </Grid>
+                        <Viewbox Width="15"
+                                      Height="15"
+                                      Stretch="Uniform">
+                                <Path Data="{StaticResource FeatherCopyGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
                     </Button>
 
                     <Button Style="{StaticResource DangerIconButtonStyle}"
                             Command="{Binding DataContext.DeleteSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                             CommandParameter="{Binding}"
                             ToolTip="Delete sub-th1ng">
-                        <Path Data="{StaticResource CloseGeometry}"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                              StrokeThickness="1.4"
-                              StrokeStartLineCap="Round"
-                              StrokeEndLineCap="Round"
-                              StrokeLineJoin="Round"/>
+                        <Viewbox Width="15"
+                                      Height="15"
+                                      Stretch="Uniform">
+                                <Path Data="{StaticResource FeatherTrashGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
                     </Button>
                 </StackPanel>
             </Grid>
@@ -691,12 +748,12 @@
 
                                             <Grid Width="15"
                                                   Height="15">
-                                                <Path Data="{StaticResource PlayGeometry}"
-                                                      Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                                      StrokeThickness="1">
-                                                    <Path.Style>
-                                                        <Style TargetType="Path">
+                                                <Viewbox Width="15"
+                                                              Height="15"
+                                                              Stretch="Uniform">
+                                                    <Viewbox.Style>
+                                                        <Style TargetType="Viewbox">
+                                                            
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsTimerRunning}"
                                                                              Value="True">
@@ -705,18 +762,22 @@
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </Path.Style>
-                                                </Path>
+                                                    </Viewbox.Style>
+                                                    <Path Data="{StaticResource FeatherPlayGeometry}"
+                                                          Fill="Transparent"
+                                                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                                          StrokeThickness="1.8"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round"
+                                                          StrokeLineJoin="Round"/>
+                                                </Viewbox>
 
-                                                <Path Data="{StaticResource PauseGeometry}"
-                                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                                      StrokeThickness="1.8"
-                                                      StrokeStartLineCap="Round"
-                                                      StrokeEndLineCap="Round">
-                                                    <Path.Style>
-                                                        <Style TargetType="Path">
-                                                            <Setter Property="Visibility"
-                                                                    Value="Collapsed"/>
+                                                <Viewbox Width="15"
+                                                              Height="15"
+                                                              Stretch="Uniform">
+                                                    <Viewbox.Style>
+                                                        <Style TargetType="Viewbox">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsTimerRunning}"
                                                                              Value="True">
@@ -725,8 +786,15 @@
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
-                                                    </Path.Style>
-                                                </Path>
+                                                    </Viewbox.Style>
+                                                    <Path Data="{StaticResource FeatherPauseGeometry}"
+                                                          Fill="Transparent"
+                                                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                                          StrokeThickness="1.8"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round"
+                                                          StrokeLineJoin="Round"/>
+                                                </Viewbox>
                                             </Grid>
                                         </Button>
 
@@ -828,79 +896,88 @@
                                         CommandParameter="{Binding}"
                                         ToolTip="Complete or reopen th1ng">
                                     <Grid Width="15"
-                                          Height="15">
-                                        <Path Data="{StaticResource CheckGeometry}"
-                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                              StrokeThickness="1.8"
-                                              StrokeStartLineCap="Round"
-                                              StrokeEndLineCap="Round"
-                                              StrokeLineJoin="Round">
-                                            <Path.Style>
-                                                <Style TargetType="Path">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsCompleted}"
-                                                                     Value="True">
-                                                            <Setter Property="Visibility"
-                                                                    Value="Collapsed"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Path.Style>
-                                        </Path>
-                                        <Path Data="{StaticResource ReopenArrowGeometry}"
-                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                              StrokeThickness="1.6"
-                                              StrokeStartLineCap="Round"
-                                              StrokeEndLineCap="Round"
-                                              StrokeLineJoin="Round"
-                                              RenderTransformOrigin="0.5,0.5">
-                                            <Path.RenderTransform>
-                                                <ScaleTransform ScaleX="1.18"
-                                                                ScaleY="1.18"/>
-                                            </Path.RenderTransform>
-                                            <Path.Style>
-                                                <Style TargetType="Path">
-                                                    <Setter Property="Visibility"
-                                                            Value="Collapsed"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsCompleted}"
-                                                                     Value="True">
-                                                            <Setter Property="Visibility"
-                                                                    Value="Visible"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Path.Style>
-                                        </Path>
-                                    </Grid>
+                              Height="15">
+                            <Viewbox Width="15"
+                                          Height="15"
+                                          Stretch="Uniform">
+                                <Viewbox.Style>
+                                    <Style TargetType="Viewbox">
+                                        
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCompleted}"
+                                                         Value="True">
+                                                <Setter Property="Visibility"
+                                                        Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Viewbox.Style>
+                                <Path Data="{StaticResource FeatherCheckGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
+
+                            <Viewbox Width="15"
+                                          Height="15"
+                                          Stretch="Uniform">
+                                <Viewbox.Style>
+                                    <Style TargetType="Viewbox">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCompleted}"
+                                                         Value="True">
+                                                <Setter Property="Visibility"
+                                                        Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Viewbox.Style>
+                                <Path Data="{StaticResource FeatherRotateCcwGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
+                        </Grid>
                                 </Button>
                                 <Button Style="{StaticResource CompletionIconButtonStyle}"
                                         Command="{Binding DataContext.CopyTh1ngTextCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"
                                         ToolTip="Copy th1ng text">
-                                    <Grid Width="15"
-                                          Height="15">
-                                        <Path Data="M 5,2 L 12,2 L 12,9 L 10.5,9 L 10.5,3.5 L 5,3.5 Z"
-                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                              StrokeThickness="1.25"
-                                              StrokeLineJoin="Round"/>
-                                        <Path Data="M 2,5 L 9,5 L 9,12 L 2,12 Z"
-                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                              StrokeThickness="1.25"
-                                              StrokeLineJoin="Round"/>
-                                    </Grid>
+                                    <Viewbox Width="15"
+                                      Height="15"
+                                      Stretch="Uniform">
+                                <Path Data="{StaticResource FeatherCopyGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
                                 </Button>
 
                                 <Button Style="{StaticResource DangerIconButtonStyle}"
                                         Command="{Binding DataContext.DeleteTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"
                                         ToolTip="Delete th1ng">
-                                    <Path Data="{StaticResource CloseGeometry}"
-                                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                          StrokeThickness="1.4"
-                                          StrokeStartLineCap="Round"
-                                          StrokeEndLineCap="Round"
-                                          StrokeLineJoin="Round"/>
+                                    <Viewbox Width="15"
+                                      Height="15"
+                                      Stretch="Uniform">
+                                <Path Data="{StaticResource FeatherTrashGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
                                 </Button>
                             </StackPanel>
                         </Grid>
@@ -1189,7 +1266,8 @@
 
                 <!-- TH1NGS / DONE / SETTINGS BUTTON -->
 
-                <Grid Style="{StaticResource MainNavigationVisibilityStyle}">
+                <Grid Style="{StaticResource MainNavigationVisibilityStyle}"
+                      Margin="0,3,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -1203,34 +1281,60 @@
                         <Button Command="{Binding ShowOpenCommand}"
                                 Style="{StaticResource OpenSectionButtonStyle}"
                                 ToolTip="Show open th1ngs">
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <Viewbox Width="15"
+                                      Height="15"
+                                      Margin="0,0,6,0"
+                                      Stretch="Uniform">
+                                <Path Data="{StaticResource FeatherListGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
                                 <TextBlock Text="TH1NGS"
                                            FontSize="14"
                                            FontWeight="SemiBold"
                                            Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                                 <TextBlock Text="  ·  "
                                            FontSize="12"
-                                           Foreground="{StaticResource MutedTextBrush}"/>
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                                 <TextBlock Text="{Binding OpenTh1ngs.Count}"
                                            FontSize="13"
-                                           Foreground="{StaticResource MutedTextBrush}"/>
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                             </StackPanel>
                         </Button>
 
                         <Button Command="{Binding ShowDoneCommand}"
                                 Style="{StaticResource DoneSectionButtonStyle}"
                                 ToolTip="Show completed th1ngs">
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <Viewbox Width="15"
+                                      Height="15"
+                                      Margin="0,0,6,0"
+                                      Stretch="Uniform">
+                                <Path Data="{StaticResource FeatherCheckCircleGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
                                 <TextBlock Text="DONE"
                                            FontSize="14"
                                            FontWeight="SemiBold"
                                            Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                                 <TextBlock Text="  ·  "
                                            FontSize="12"
-                                           Foreground="{StaticResource MutedTextBrush}"/>
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                                 <TextBlock Text="{Binding DoneTh1ngs.Count}"
                                            FontSize="13"
-                                           Foreground="{StaticResource MutedTextBrush}"/>
+                                           Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -1241,9 +1345,17 @@
                             VerticalAlignment="Center"
                             Style="{StaticResource IconButtonStyle}"
                             ToolTip="Settings">
-                        <TextBlock Text="⚙"
-                                   FontFamily="Segoe UI Symbol"
-                                   FontSize="17"/>
+                        <Viewbox Width="17"
+                                      Height="17"
+                                      Stretch="Uniform">
+                                <Path Data="{StaticResource FeatherSettingsGeometry}"
+                                      Fill="Transparent"
+                                      Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Viewbox>
                     </Button>
                 </Grid>
 
@@ -1269,17 +1381,17 @@
                                             Background="Transparent"
                                             CornerRadius="8">
                                         <Grid>
-                                            <Path Data="M 10,4 L 5,8 L 10,12"
-                                                  Width="10"
-                                                  Height="16"
-                                                  HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"
-                                                  Stretch="Uniform"
-                                                  Stroke="{StaticResource SecondaryTextBrush}"
-                                                  StrokeThickness="1.6"
-                                                  StrokeStartLineCap="Round"
-                                                  StrokeEndLineCap="Round"
-                                                  StrokeLineJoin="Round"/>
+                                            <Viewbox Width="16"
+                                                          Height="16"
+                                                          Stretch="Uniform">
+                                                    <Path Data="{StaticResource FeatherChevronLeftGeometry}"
+                                                          Fill="Transparent"
+                                                          Stroke="{StaticResource SecondaryTextBrush}"
+                                                          StrokeThickness="1.8"
+                                                          StrokeStartLineCap="Round"
+                                                          StrokeEndLineCap="Round"
+                                                          StrokeLineJoin="Round"/>
+                                                </Viewbox>
                                         </Grid>
                                     </Border>
                                     <ControlTemplate.Triggers>
@@ -1371,7 +1483,8 @@
                             </TextBlock.Style>
                         </TextBlock>
                         <ItemsControl ItemsSource="{Binding DoneTh1ngs}"
-                                      ItemTemplate="{StaticResource Th1ngTemplate}"/>
+                                      ItemTemplate="{StaticResource Th1ngTemplate}"
+                                      Margin="0,7,0,0"/>
                     </Grid>
 
                     <!-- SETTINGS -->
