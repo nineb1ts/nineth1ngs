@@ -26,11 +26,11 @@ namespace nineth1ngs.Data.Migrations
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ElapsedSeconds")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("ElapsedSeconds")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("INTEGER");
@@ -38,24 +38,26 @@ namespace nineth1ngs.Data.Migrations
                     b.Property<int?>("ParentId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("TimerStartedAt")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasIndex("ParentId");
-
-                    b.HasOne("nineth1ngs.Models.Th1ng", null)
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired(false);
+                    b.Property<DateTime?>("TimerStartedAt")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Th1ngs");
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("Th1ngs", (string)null);
+                });
+
+            modelBuilder.Entity("nineth1ngs.Models.Th1ng", b =>
+                {
+                    b.HasOne("nineth1ngs.Models.Th1ng", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

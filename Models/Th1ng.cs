@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -32,11 +31,11 @@ public partial class Th1ng : ObservableObject
     private int? parentId;
 
     [ObservableProperty]
-    [NotMapped]
+    [property: NotMapped]
     private bool isTimeCopied;
 
     [ObservableProperty]
-    [NotMapped]
+    [property: NotMapped]
     private string timeCopyToolTip = "Copy tracked time";
 
     private bool isEditing;
