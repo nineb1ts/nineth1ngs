@@ -21,12 +21,12 @@
                        FontFamily="Segoe UI Variable Display"
                        FontSize="21"
                        FontWeight="SemiBold"
-                       Foreground="{StaticResource PrimaryTextBrush}" />
+                       Foreground="{StaticResource PrimaryTextBrush}"/>
             <TextBlock Margin="0,8,0,0"
                        Text="This cannot be undone."
                        FontFamily="Segoe UI Variable Small"
-                       FontSize="13"
-                       Foreground="{StaticResource SecondaryTextBrush}" />
+                       FontSize="14"
+                       Foreground="{StaticResource SecondaryTextBrush}"/>
             <Border Margin="0,14,0,0"
                     Padding="12"
                     Background="{StaticResource SurfaceHighlightBrush}"
@@ -35,21 +35,24 @@
                            TextWrapping="Wrap"
                            MaxHeight="60"
                            FontFamily="Segoe UI Variable Small"
-                           FontSize="13"
-                           Foreground="{StaticResource PrimaryTextBrush}" />
+                           FontSize="14"
+                           Foreground="{StaticResource PrimaryTextBrush}"/>
             </Border>
             <TextBlock Text="{Binding SubTh1ngMessage}"
                        Margin="0,10,0,0"
                        TextWrapping="Wrap"
                        FontFamily="Segoe UI Variable Small"
-                       FontSize="11"
+                       FontSize="12"
                        Foreground="{StaticResource SecondaryTextBrush}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Setter Property="Visibility"
+                                Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasSubTh1ngs}" Value="True">
-                                <Setter Property="Visibility" Value="Visible" />
+                            <DataTrigger Binding="{Binding HasSubTh1ngs}"
+                                         Value="True">
+                                <Setter Property="Visibility"
+                                        Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -60,11 +63,12 @@
                         HorizontalAlignment="Right">
                 <Button Content="Cancel"
                         Click="CancelClick"
-                    Style="{StaticResource DialogButtonStyle}"
-                        Margin="0,0,8,0" />
+                        Style="{StaticResource DialogButtonStyle}"
+                        Margin="0,0,12,0"/>
+
                 <Button Content="Delete"
                         Click="DeleteClick"
-                    Style="{StaticResource DangerDialogButtonStyle}" />
+                        Style="{StaticResource DangerDialogButtonStyle}"/>
             </StackPanel>
         </StackPanel>
     </Border>
