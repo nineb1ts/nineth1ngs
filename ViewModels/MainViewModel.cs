@@ -153,13 +153,26 @@ public partial class MainViewModel : ObservableObject
     {
         var previousIsCompleted = th1ng.IsCompleted;
         var previousCompletedAt = th1ng.CompletedAt;
+        var previousElapsedSeconds = th1ng.ElapsedSeconds;
+        var previousTimerStartedAt = th1ng.TimerStartedAt;
 
         th1ng.IsCompleted = !previousIsCompleted;
-        th1ng.CompletedAt = th1ng.IsCompleted ? DateTime.UtcNow : null;
+        th1ng.CompletedAt = th1ng.IsCompleted
+            ? DateTime.UtcNow
+            : null;
+
+        // Stop a running timer when the th1ng is completed.
+        if (th1ng.IsCompleted && th1ng.IsTimerRunning)
+        {
+            th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds();
+            th1ng.TimerStartedAt = null;
+            th1ng.RefreshTimerDisplay();
+        }
 
         try
         {
             await store.UpdateAsync(th1ng);
+
             if (!th1ng.ParentId.HasValue)
             {
                 RefreshSections(th1ng);
@@ -169,6 +182,10 @@ public partial class MainViewModel : ObservableObject
         {
             th1ng.IsCompleted = previousIsCompleted;
             th1ng.CompletedAt = previousCompletedAt;
+            th1ng.ElapsedSeconds = previousElapsedSeconds;
+            th1ng.TimerStartedAt = previousTimerStartedAt;
+            th1ng.RefreshTimerDisplay();
+
             ReportError("The completion state could not be saved.");
         }
     }
