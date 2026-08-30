@@ -234,10 +234,15 @@
                             </Path>
                             <Path Data="{StaticResource ReopenArrowGeometry}"
                                   Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.4"
+                                  StrokeThickness="1.5"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round">
+                                  StrokeLineJoin="Round"
+                                  RenderTransformOrigin="0.5,0.5">
+                                <Path.RenderTransform>
+                                    <ScaleTransform ScaleX="1.18"
+                                                    ScaleY="1.18"/>
+                                </Path.RenderTransform>
                                 <Path.Style>
                                     <Style TargetType="Path">
                                         <Setter Property="Visibility"
@@ -252,6 +257,23 @@
                                     </Style>
                                 </Path.Style>
                             </Path>
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource CompletionIconButtonStyle}"
+                            Command="{Binding DataContext.CopyTh1ngTextCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            CommandParameter="{Binding}"
+                            ToolTip="Copy sub-th1ng text">
+                        <Grid Width="15"
+                              Height="15">
+                            <Path Data="M 5,2 L 12,2 L 12,9 L 10.5,9 L 10.5,3.5 L 5,3.5 Z"
+                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                  StrokeThickness="1.25"
+                                  StrokeLineJoin="Round"/>
+                            <Path Data="M 2,5 L 9,5 L 9,12 L 2,12 Z"
+                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                  StrokeThickness="1.25"
+                                  StrokeLineJoin="Round"/>
                         </Grid>
                     </Button>
 
@@ -550,10 +572,15 @@
                                         </Path>
                                         <Path Data="{StaticResource ReopenArrowGeometry}"
                                               Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                              StrokeThickness="1.5"
+                                              StrokeThickness="1.6"
                                               StrokeStartLineCap="Round"
                                               StrokeEndLineCap="Round"
-                                              StrokeLineJoin="Round">
+                                              StrokeLineJoin="Round"
+                                              RenderTransformOrigin="0.5,0.5">
+                                            <Path.RenderTransform>
+                                                <ScaleTransform ScaleX="1.18"
+                                                                ScaleY="1.18"/>
+                                            </Path.RenderTransform>
                                             <Path.Style>
                                                 <Style TargetType="Path">
                                                     <Setter Property="Visibility"
@@ -570,6 +597,23 @@
                                         </Path>
                                     </Grid>
                                 </Button>
+                                <Button Style="{StaticResource CompletionIconButtonStyle}"
+                                        Command="{Binding DataContext.CopyTh1ngTextCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Copy th1ng text">
+                                    <Grid Width="15"
+                                          Height="15">
+                                        <Path Data="M 5,2 L 12,2 L 12,9 L 10.5,9 L 10.5,3.5 L 5,3.5 Z"
+                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                              StrokeThickness="1.25"
+                                              StrokeLineJoin="Round"/>
+                                        <Path Data="M 2,5 L 9,5 L 9,12 L 2,12 Z"
+                                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                              StrokeThickness="1.25"
+                                              StrokeLineJoin="Round"/>
+                                    </Grid>
+                                </Button>
+
                                 <Button Style="{StaticResource DangerIconButtonStyle}"
                                         Command="{Binding DataContext.DeleteTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"

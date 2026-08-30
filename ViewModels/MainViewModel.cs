@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using nineth1ngs.Models;
 using nineth1ngs.Services;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace nineth1ngs.ViewModels;
@@ -229,6 +230,24 @@ public partial class MainViewModel : ObservableObject
         {
             th1ng.TimerStartedAt = previousTimerStartedAt;
             ReportError("The timer could not be started.", exception);
+        }
+    }
+
+    [RelayCommand]
+    private void CopyTh1ngText(Th1ng th1ng)
+    {
+        if (string.IsNullOrWhiteSpace(th1ng.Text))
+        {
+            return;
+        }
+
+        try
+        {
+            Clipboard.SetText(th1ng.Text);
+        }
+        catch (Exception exception)
+        {
+            ReportError("The th1ng text could not be copied.", exception);
         }
     }
 
