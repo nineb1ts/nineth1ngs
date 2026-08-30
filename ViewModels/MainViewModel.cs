@@ -61,11 +61,17 @@ public partial class MainViewModel : ObservableObject
                 .Where(th1ng => !th1ng.ParentId.HasValue)
                 .OrderByDescending(th1ng => th1ng.CreatedAt)
                 .ToList();
-            var topLevelIds = topLevelTh1ngs.Select(th1ng => th1ng.Id).ToHashSet();
+
+            var topLevelIds = topLevelTh1ngs
+                .Select(th1ng => th1ng.Id)
+                .ToHashSet();
+
             var subTh1ngsByParent = th1ngs
                 .Where(th1ng => th1ng.ParentId.HasValue && topLevelIds.Contains(th1ng.ParentId.Value))
                 .GroupBy(th1ng => th1ng.ParentId!.Value)
-                .ToDictionary(group => group.Key, group => group.OrderByDescending(th1ng => th1ng.CreatedAt).ToList());
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.OrderByDescending(th1ng => th1ng.CreatedAt).ToList());
 
             foreach (var th1ng in topLevelTh1ngs)
             {
@@ -161,7 +167,6 @@ public partial class MainViewModel : ObservableObject
             ? DateTime.UtcNow
             : null;
 
-        // Stop a running timer when the th1ng is completed.
         if (th1ng.IsCompleted && th1ng.IsTimerRunning)
         {
             th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds();
@@ -193,7 +198,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task ToggleTimerAsync(Th1ng th1ng)
     {
-        if (th1ng.ParentId.HasValue)
+        if (th1ng.ParentId.HasValue || th1ng.IsCompleted)
         {
             return;
         }
@@ -238,6 +243,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.DeleteAsync(th1ng);
+
             if (th1ng.ParentId.HasValue)
             {
                 FindParent(th1ng)?.SubTh1ngs.Remove(th1ng);
@@ -251,6 +257,25 @@ public partial class MainViewModel : ObservableObject
         catch (Exception exception)
         {
             ReportError("The th1ng could not be deleted.", exception);
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteSubTh1ngAsync(Th1ng subTh1ng)
+    {
+        if (!subTh1ng.ParentId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            await store.DeleteAsync(subTh1ng);
+            FindParent(subTh1ng)?.SubTh1ngs.Remove(subTh1ng);
+        }
+        catch (Exception exception)
+        {
+            ReportError("The sub-th1ng could not be deleted.", exception);
         }
     }
 
@@ -282,6 +307,22 @@ public partial class MainViewModel : ObservableObject
     private async Task SaveEditingAsync(Th1ng th1ng)
     {
         var text = th1ng.EditText.Trim();
+
+        if (text.Length == 0 && th1ng.ParentId.HasValue)
+        {
+            try
+            {
+                await store.DeleteAsync(th1ng);
+                FindParent(th1ng)?.SubTh1ngs.Remove(th1ng);
+            }
+            catch (Exception exception)
+            {
+                ReportError("The sub-th1ng could not be deleted.", exception);
+            }
+
+            return;
+        }
+
         if (text.Length == 0)
         {
             return;
@@ -329,7 +370,10 @@ public partial class MainViewModel : ObservableObject
 
     private void ReportError(string message, Exception? exception = null)
     {
-        var details = exception is null ? string.Empty : $"\n\n{exception.Message}";
+        var details = exception is null
+            ? string.Empty
+            : $"\n\n{exception.Message}";
+
         showError($"{message}{details}");
     }
 
@@ -337,6 +381,7 @@ public partial class MainViewModel : ObservableObject
     {
         var previousElapsedSeconds = th1ng.ElapsedSeconds;
         var previousTimerStartedAt = th1ng.TimerStartedAt;
+
         th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds();
         th1ng.TimerStartedAt = null;
 
@@ -366,5 +411,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     private Th1ng? FindParent(Th1ng subTh1ng) =>
-        OpenTh1ngs.Concat(DoneTh1ngs).FirstOrDefault(parent => parent.SubTh1ngs.Contains(subTh1ng));
+        OpenTh1ngs
+            .Concat(DoneTh1ngs)
+            .FirstOrDefault(parent => parent.SubTh1ngs.Contains(subTh1ng));
 }
