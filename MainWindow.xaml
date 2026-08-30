@@ -40,6 +40,13 @@
                     Value="Transparent"/>
             <Setter Property="Foreground"
                     Value="{StaticResource AccentBrush}"/>
+            <Setter Property="BorderBrush"
+                    Value="Transparent"/>
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+            <Setter Property="FocusVisualStyle"
+                    Value="{x:Null}"/>
+
             <Style.Triggers>
                 <DataTrigger Binding="{Binding SelectedSection}"
                              Value="done">
@@ -56,6 +63,12 @@
                     Value="Transparent"/>
             <Setter Property="Foreground"
                     Value="{StaticResource MutedTextBrush}"/>
+            <Setter Property="BorderBrush"
+                    Value="Transparent"/>
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+            <Setter Property="FocusVisualStyle"
+                    Value="{x:Null}"/>
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding SelectedSection}"
