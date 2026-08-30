@@ -14,6 +14,8 @@ public partial class MainViewModel : ObservableObject
     private readonly Func<Th1ng, Task<bool>> confirmDelete;
     private readonly Action<string> showError;
     private readonly DispatcherTimer timer;
+    private readonly TimeFormattingService timeFormattingService = new();
+    private readonly TimeCopySettings timeCopySettings = new();
 
     public MainViewModel(
         Th1ngStore store,
@@ -193,6 +195,33 @@ public partial class MainViewModel : ObservableObject
             th1ng.RefreshTimerDisplay();
 
             ReportError("The completion state could not be saved.");
+        }
+    }
+
+    [RelayCommand]
+    private async Task CopyTrackedTimeAsync(Th1ng th1ng)
+    {
+        try
+        {
+            var elapsedSeconds = th1ng.GetElapsedSeconds();
+
+            var formattedTime = timeFormattingService.FormatForCopy(
+                elapsedSeconds,
+                timeCopySettings);
+
+            Clipboard.SetText(formattedTime);
+
+            th1ng.IsTimeCopied = true;
+            th1ng.TimeCopyToolTip = $"Copied {formattedTime}";
+
+            await Task.Delay(1200);
+
+            th1ng.IsTimeCopied = false;
+            th1ng.TimeCopyToolTip = "Copy tracked time";
+        }
+        catch (Exception exception)
+        {
+            ReportError("The tracked time could not be copied.", exception);
         }
     }
 

@@ -31,6 +31,14 @@ public partial class Th1ng : ObservableObject
     [ObservableProperty]
     private int? parentId;
 
+    [ObservableProperty]
+    [NotMapped]
+    private bool isTimeCopied;
+
+    [ObservableProperty]
+    [NotMapped]
+    private string timeCopyToolTip = "Copy tracked time";
+
     private bool isEditing;
 
     private string editText = string.Empty;
