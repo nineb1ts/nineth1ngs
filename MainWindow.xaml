@@ -921,7 +921,7 @@
                         <Button Command="{Binding DataContext.BeginAddSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 HorizontalAlignment="Left"
-                                Margin="22,3,0,0"
+                                Margin="22,9,0,0"
                                 Padding="0,2"
                                 Cursor="Hand"
                                 ToolTip="Add sub-th1ng"
@@ -934,20 +934,22 @@
                                 </ControlTemplate>
                             </Button.Template>
 
-                            <TextBlock Text="+ subth1ng"
+                            <TextBlock Text="+ add"
                                        FontFamily="Segoe UI Variable Small"
                                        FontSize="13"
-                                       FontWeight="SemiBold">
+                                       FontWeight="Normal">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground"
-                                                Value="{StaticResource AccentBrush}"/>
+                                                Value="{StaticResource MutedTextBrush}"/>
                                         <Setter Property="Opacity"
-                                                Value="0.72"/>
+                                                Value="0.75"/>
 
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}"
                                                          Value="True">
+                                                <Setter Property="Foreground"
+                                                        Value="{StaticResource AccentBrush}"/>
                                                 <Setter Property="Opacity"
                                                         Value="1"/>
                                             </DataTrigger>
