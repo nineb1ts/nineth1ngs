@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     private DateTime? sessionLockedAtUtc;
     private Th1ng? sessionLockedTimerTh1ng;
     private bool sessionTimeReviewOpen;
+    private Views.MiniModeWindow? miniModeWindow;
 
     public MainWindow(
         Th1ngStore store,
@@ -287,6 +288,59 @@ public partial class MainWindow : Window
             Keyboard.Focus(NewTh1ngTextBox);
             NewTh1ngTextBox.CaretIndex = NewTh1ngTextBox.Text.Length;
         });
+    }
+
+    private void MiniModeClick(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel ||
+            miniModeWindow is not null)
+        {
+            return;
+        }
+
+        var miniWindow = new Views.MiniModeWindow(
+            viewModel,
+            ReturnToNormalMode);
+
+        miniModeWindow = miniWindow;
+        miniWindow.Closed += MiniModeWindowClosed;
+        miniWindow.Left = Left + 16;
+        miniWindow.Top = Top + 16;
+        miniWindow.Show();
+
+        Hide();
+        miniWindow.Activate();
+    }
+
+    private void ReturnToNormalMode()
+    {
+        var miniWindow = miniModeWindow;
+
+        if (miniWindow is null)
+        {
+            return;
+        }
+
+        miniModeWindow = null;
+        miniWindow.Close();
+        Show();
+        Activate();
+    }
+
+    private void MiniModeWindowClosed(
+        object? sender,
+        EventArgs e)
+    {
+        if (!ReferenceEquals(sender, miniModeWindow))
+        {
+            return;
+        }
+
+        miniModeWindow = null;
+        Show();
+        Activate();
     }
 
     private void TitleBarMouseLeftButtonDown(

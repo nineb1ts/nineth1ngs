@@ -100,6 +100,10 @@
                                RadiusY="1"/>
         </GeometryGroup>
 
+        <GeometryGroup x:Key="FeatherMinimizeGeometry">
+            <PathGeometry Figures="M8,3 L3,3 L3,8 M16,3 L21,3 L21,8 M8,21 L3,21 L3,16 M16,21 L21,21 L21,16"/>
+        </GeometryGroup>
+
 
         <Style x:Key="OpenSectionButtonStyle"
                BasedOn="{StaticResource SectionButtonStyle}"
@@ -1265,6 +1269,22 @@
                               Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
                               StrokeThickness="1.4"
                               StrokeStartLineCap="Round"/>
+                    </Button>
+
+                    <Button Click="MiniModeClick"
+                            Style="{StaticResource WindowButtonStyle}"
+                            ToolTip="Mini mode">
+                        <Viewbox Width="15"
+                                 Height="15"
+                                 Stretch="Uniform">
+                            <Path Data="{StaticResource FeatherMinimizeGeometry}"
+                                  Fill="Transparent"
+                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                  StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"/>
+                        </Viewbox>
                     </Button>
 
                     <Button Click="MaximizeClick"

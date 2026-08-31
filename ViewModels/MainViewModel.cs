@@ -65,6 +65,10 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<Th1ng> DoneTh1ngs { get; } = [];
 
+    public Th1ng? ActiveTh1ng => OpenTh1ngs
+        .Concat(DoneTh1ngs)
+        .FirstOrDefault(th1ng => th1ng.IsTimerRunning);
+
     public IReadOnlyList<int> BillingIntervals { get; } =
     [
         15,
@@ -223,6 +227,7 @@ public partial class MainViewModel : ObservableObject
             }
 
             ApplySavedOpenOrder();
+            OnPropertyChanged(nameof(ActiveTh1ng));
         }
         catch (Exception exception)
         {
@@ -404,6 +409,7 @@ public partial class MainViewModel : ObservableObject
             th1ng.ElapsedSeconds = th1ng.GetElapsedSeconds();
             th1ng.TimerStartedAt = null;
             th1ng.RefreshTimerDisplay();
+            OnPropertyChanged(nameof(ActiveTh1ng));
         }
 
         try
@@ -423,6 +429,7 @@ public partial class MainViewModel : ObservableObject
             th1ng.ElapsedSeconds = previousElapsedSeconds;
             th1ng.TimerStartedAt = previousTimerStartedAt;
             th1ng.RefreshTimerDisplay();
+            OnPropertyChanged(nameof(ActiveTh1ng));
 
             ReportError("The completion state could not be saved.");
         }
@@ -460,10 +467,12 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.UpdateAsync(th1ng);
+            OnPropertyChanged(nameof(ActiveTh1ng));
         }
         catch (Exception exception)
         {
             th1ng.TimerStartedAt = previousTimerStartedAt;
+            OnPropertyChanged(nameof(ActiveTh1ng));
             ReportError("The timer could not be started.", exception);
         }
     }
@@ -563,11 +572,13 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.UpdateAsync(th1ng);
+            OnPropertyChanged(nameof(ActiveTh1ng));
             return true;
         }
         catch (Exception exception)
         {
             th1ng.TimerStartedAt = previousTimerStartedAt;
+            OnPropertyChanged(nameof(ActiveTh1ng));
 
             ReportError(
                 "The timer could not be resumed after unlocking Windows.",
@@ -648,6 +659,7 @@ public partial class MainViewModel : ObservableObject
                 DoneTh1ngs.Remove(th1ng);
                 th1ngOrderService.Remove(th1ng.Id);
                 SaveOpenOrder();
+                OnPropertyChanged(nameof(ActiveTh1ng));
             }
         }
         catch (Exception exception)
@@ -690,12 +702,14 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await store.UpdateAsync(th1ng);
+            OnPropertyChanged(nameof(ActiveTh1ng));
             return true;
         }
         catch (Exception exception)
         {
             th1ng.ElapsedSeconds = previousElapsedSeconds;
             th1ng.TimerStartedAt = previousTimerStartedAt;
+            OnPropertyChanged(nameof(ActiveTh1ng));
 
             ReportError("The timer could not be paused.", exception);
             return false;
@@ -711,6 +725,8 @@ public partial class MainViewModel : ObservableObject
                 th1ng.RefreshTimerDisplay();
             }
         }
+
+        OnPropertyChanged(nameof(ActiveTh1ng));
     }
 
     private void AddToSection(Th1ng th1ng)
