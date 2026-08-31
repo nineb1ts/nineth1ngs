@@ -1,0 +1,62 @@
+name: Bug report
+description: Report something that is not working as expected
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Which version of nineth1ngs are you using?
+      placeholder: e.g. v1.0.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem as clearly as possible.
+      placeholder: Tell us what went wrong.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+      placeholder: Describe the expected behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What steps can be used to reproduce the issue?
+      placeholder: |
+        1. Open nineth1ngs
+        2. Start a timer
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: Add screenshots, logs, or anything else that might help.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked that this issue has not already been reported.
+          required: true
