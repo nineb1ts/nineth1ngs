@@ -697,6 +697,21 @@ public partial class MainWindow : Window
         });
     }
 
+    private void SubTh1ngTextBoxIsVisibleChanged(
+        object sender,
+        DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is not TextBox textBox ||
+            textBox.Visibility != Visibility.Visible)
+        {
+            return;
+        }
+
+        textBox.Focus();
+        Keyboard.Focus(textBox);
+        textBox.CaretIndex = textBox.Text.Length;
+    }
+
     private IntPtr WindowProc(
         IntPtr hwnd,
         int msg,
@@ -779,6 +794,9 @@ public partial class MainWindow : Window
 
         minMaxInfo.ptMaxSize.Y =
             Math.Abs(workArea.Bottom - workArea.Top);
+
+        minMaxInfo.ptMinTrackSize.X = 400;
+        minMaxInfo.ptMinTrackSize.Y = 575;
 
         Marshal.StructureToPtr(
             minMaxInfo,

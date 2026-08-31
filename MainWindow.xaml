@@ -1,4 +1,4 @@
-<Window x:Class="nineth1ngs.MainWindow"
+﻿<Window x:Class="nineth1ngs.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,7 +10,7 @@
         Width="520"
         Height="720"
         MinWidth="400"
-        MinHeight="520"
+        MinHeight="575"
         Background="Transparent"
         Foreground="{StaticResource PrimaryTextBrush}"
         WindowStyle="None"
@@ -824,7 +824,7 @@
                                             </Button>
 
                                             <TextBlock Text="{Binding ElapsedTimeText}"
-                                                       Width="48"
+                                                       MinWidth="72"
                                                        VerticalAlignment="Center"
                                                        FontFamily="Segoe UI Variable Small"
                                                        FontSize="17"
@@ -1166,6 +1166,7 @@
                                              FontFamily="Segoe UI Variable Small"
                                              FontSize="16"
                                              CaretBrush="{StaticResource AccentBrush}"
+                                             IsVisibleChanged="SubTh1ngTextBoxIsVisibleChanged"
                                              ToolTip="Write a sub-th1ng and press Enter">
 
                                         <TextBox.InputBindings>
@@ -1221,8 +1222,9 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="42"/>
                 <RowDefinition Height="46"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="64"/>
+                <RowDefinition Height="*"
+                               MinHeight="0"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- ===================================================== -->
@@ -1454,6 +1456,7 @@
 
             <ScrollViewer x:Name="ContentScrollViewer"
                           Grid.Row="2"
+                          MinHeight="0"
                           Padding="18,6,18,8"
                           VerticalScrollBarVisibility="Hidden"
                           HorizontalScrollBarVisibility="Disabled"
