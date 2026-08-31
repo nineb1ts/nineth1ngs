@@ -19,6 +19,7 @@ public partial class MainViewModel : ObservableObject
     private readonly TimeCopySettings timeCopySettings;
     private readonly Th1ngOrderService th1ngOrderService = new();
     private string previousSection = "th1ngs";
+    private Th1ng? miniSelectedTh1ng;
     public string RoundUpThresholdHint => $"Choose a value from 1 to {BillingIntervalMinutes - 1} minutes.";
 
     public IReadOnlyList<int> RoundUpThresholds =>
@@ -68,6 +69,8 @@ public partial class MainViewModel : ObservableObject
     public Th1ng? ActiveTh1ng => OpenTh1ngs
         .Concat(DoneTh1ngs)
         .FirstOrDefault(th1ng => th1ng.IsTimerRunning);
+
+    public Th1ng? MiniDisplayedTh1ng => ActiveTh1ng ?? miniSelectedTh1ng;
 
     public IReadOnlyList<int> BillingIntervals { get; } =
     [
@@ -182,6 +185,58 @@ public partial class MainViewModel : ObservableObject
         SelectedSection = previousSection;
     }
 
+    public void SelectMiniTh1ng(Th1ng? th1ng)
+    {
+        if (th1ng is not null &&
+            (th1ng.ParentId.HasValue || !OpenTh1ngs.Contains(th1ng)))
+        {
+            return;
+        }
+
+        if (ReferenceEquals(miniSelectedTh1ng, th1ng))
+        {
+            return;
+        }
+
+        miniSelectedTh1ng = th1ng;
+        OnPropertyChanged(nameof(MiniDisplayedTh1ng));
+    }
+
+    [RelayCommand]
+    private void PreviousMiniTh1ng()
+    {
+        SelectAdjacentMiniTh1ng(-1);
+    }
+
+    [RelayCommand]
+    private void NextMiniTh1ng()
+    {
+        SelectAdjacentMiniTh1ng(1);
+    }
+
+    private void SelectAdjacentMiniTh1ng(int direction)
+    {
+        if (OpenTh1ngs.Count == 0)
+        {
+            SelectMiniTh1ng(null);
+            return;
+        }
+
+        var currentIndex = miniSelectedTh1ng is null
+            ? direction > 0 ? -1 : 0
+            : OpenTh1ngs.IndexOf(miniSelectedTh1ng);
+
+        if (currentIndex < 0)
+        {
+            currentIndex = direction > 0 ? -1 : 0;
+        }
+
+        var nextIndex = (currentIndex + direction + OpenTh1ngs.Count) %
+                        OpenTh1ngs.Count;
+
+        SelectMiniTh1ng(OpenTh1ngs[nextIndex]);
+    }
+
     public async Task LoadAsync()
     {
         try
@@ -228,6 +283,7 @@ public partial class MainViewModel : ObservableObject
 
             ApplySavedOpenOrder();
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
         }
         catch (Exception exception)
         {
@@ -410,6 +466,7 @@ public partial class MainViewModel : ObservableObject
             th1ng.TimerStartedAt = null;
             th1ng.RefreshTimerDisplay();
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
         }
 
         try
@@ -430,6 +487,7 @@ public partial class MainViewModel : ObservableObject
             th1ng.TimerStartedAt = previousTimerStartedAt;
             th1ng.RefreshTimerDisplay();
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
 
             ReportError("The completion state could not be saved.");
         }
@@ -468,11 +526,13 @@ public partial class MainViewModel : ObservableObject
         {
             await store.UpdateAsync(th1ng);
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
         }
         catch (Exception exception)
         {
             th1ng.TimerStartedAt = previousTimerStartedAt;
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
             ReportError("The timer could not be started.", exception);
         }
     }
@@ -573,12 +633,14 @@ public partial class MainViewModel : ObservableObject
         {
             await store.UpdateAsync(th1ng);
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
             return true;
         }
         catch (Exception exception)
         {
             th1ng.TimerStartedAt = previousTimerStartedAt;
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
 
             ReportError(
                 "The timer could not be resumed after unlocking Windows.",
@@ -660,6 +722,13 @@ public partial class MainViewModel : ObservableObject
                 th1ngOrderService.Remove(th1ng.Id);
                 SaveOpenOrder();
                 OnPropertyChanged(nameof(ActiveTh1ng));
+                OnPropertyChanged(nameof(MiniDisplayedTh1ng));
+
+                if (ReferenceEquals(miniSelectedTh1ng, th1ng))
+                {
+                    miniSelectedTh1ng = null;
+                    OnPropertyChanged(nameof(MiniDisplayedTh1ng));
+                }
             }
         }
         catch (Exception exception)
@@ -703,6 +772,7 @@ public partial class MainViewModel : ObservableObject
         {
             await store.UpdateAsync(th1ng);
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
             return true;
         }
         catch (Exception exception)
@@ -710,6 +780,7 @@ public partial class MainViewModel : ObservableObject
             th1ng.ElapsedSeconds = previousElapsedSeconds;
             th1ng.TimerStartedAt = previousTimerStartedAt;
             OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
 
             ReportError("The timer could not be paused.", exception);
             return false;
@@ -727,6 +798,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(ActiveTh1ng));
+        OnPropertyChanged(nameof(MiniDisplayedTh1ng));
     }
 
     private void AddToSection(Th1ng th1ng)
@@ -745,6 +817,13 @@ public partial class MainViewModel : ObservableObject
         OpenTh1ngs.Remove(th1ng);
         DoneTh1ngs.Remove(th1ng);
         AddToSection(th1ng);
+
+        if (ReferenceEquals(miniSelectedTh1ng, th1ng) &&
+            !OpenTh1ngs.Contains(th1ng))
+        {
+            miniSelectedTh1ng = null;
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
+        }
 
         if (!th1ng.IsCompleted)
         {

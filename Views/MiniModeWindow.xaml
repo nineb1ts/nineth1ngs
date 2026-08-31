@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         Title="nineth1ngs mini mode"
-        Width="320"
-        Height="116"
-        MinWidth="280"
-        MinHeight="100"
+        Width="360"
+        Height="118"
+        MinWidth="320"
+        MinHeight="106"
         Background="Transparent"
         Foreground="{StaticResource PrimaryTextBrush}"
         WindowStyle="None"
@@ -21,7 +21,7 @@
         <shell:WindowChrome CaptionHeight="0"
                             ResizeBorderThickness="6"
                             GlassFrameThickness="0"
-                            CornerRadius="0"/>
+                            CornerRadius="8"/>
     </shell:WindowChrome.WindowChrome>
 
     <Window.Resources>
@@ -38,51 +38,45 @@
                                RadiusY="1"/>
         </GeometryGroup>
 
-        <GeometryGroup x:Key="FeatherMaximizeGeometry">
+        <GeometryGroup x:Key="FeatherExpandGeometry">
             <PathGeometry Figures="M8,3 L3,3 L3,8 M16,3 L21,3 L21,8 M8,21 L3,21 L3,16 M16,21 L21,21 L21,16"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherChevronLeftGeometry">
+            <PathGeometry Figures="M15,18 L9,12 L15,6"/>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="FeatherChevronRightGeometry">
+            <PathGeometry Figures="M9,18 L15,12 L9,6"/>
         </GeometryGroup>
     </Window.Resources>
 
     <Border Background="{StaticResource WindowBackgroundBrush}"
             BorderBrush="{StaticResource BorderBrush}"
             BorderThickness="1"
-            CornerRadius="8">
-        <Grid Margin="14,9,10,10">
+            CornerRadius="10">
+        <Grid Margin="14,8,12,10">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="24"/>
+                <RowDefinition Height="42"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+                <Border Background="Transparent"
+                        MouseLeftButtonDown="MiniHeaderMouseLeftButtonDown"/>
 
-                <Border Grid.Column="0"
-                        Background="Transparent"
-                        MouseLeftButtonDown="MiniHeaderMouseLeftButtonDown">
-                    <TextBlock Text="{Binding ActiveTh1ng.Text, TargetNullValue=No active th1ng}"
-                               MaxWidth="250"
-                               FontFamily="Segoe UI Variable Small"
-                               FontSize="15"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource PrimaryTextBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                </Border>
-
-                <Button Grid.Column="1"
-                        Width="26"
-                        Height="26"
+                <Button Width="30"
+                        Height="30"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Click="ReturnToNormalClick"
                         Style="{StaticResource IconButtonStyle}"
                         ToolTip="Return to normal mode">
-                    <Viewbox Width="14"
-                             Height="14"
+                    <Viewbox Width="17"
+                             Height="17"
                              Stretch="Uniform">
-                        <Path Data="{StaticResource FeatherMaximizeGeometry}"
+                        <Path Data="{StaticResource FeatherExpandGeometry}"
                               Fill="Transparent"
                               Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
                               StrokeThickness="1.7"
@@ -93,12 +87,77 @@
                 </Button>
             </Grid>
 
-            <StackPanel Grid.Row="1"
-                        Margin="0,4,0,0"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center">
+            <Grid Grid.Row="1"
+                  Margin="0,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Vertical"
+                            VerticalAlignment="Center">
+                    <TextBlock
+                           VerticalAlignment="Center"
+                           Text="{Binding MiniDisplayedTh1ng.Text, TargetNullValue=No active th1ng}"
+                           TextTrimming="CharacterEllipsis"
+                           FontFamily="Segoe UI Variable Small"
+                           FontSize="17"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource PrimaryTextBrush}"/>
+
+                    <TextBlock Text="Use &lt; and &gt; to choose one"
+                               FontFamily="Segoe UI Variable Small"
+                               FontSize="10"
+                               Foreground="{StaticResource MutedTextBrush}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility"
+                                        Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MiniDisplayedTh1ng}"
+                                                 Value="{x:Null}">
+                                        <Setter Property="Visibility"
+                                                Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="2"
+                  Margin="-5,0,-5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Width="28"
+                        Height="30"
+                        HorizontalAlignment="Left"
+                        Command="{Binding PreviousMiniTh1ngCommand}"
+                        Style="{StaticResource IconButtonStyle}"
+                        ToolTip="Previous open th1ng">
+                    <Viewbox Width="16"
+                             Height="16"
+                             Stretch="Uniform">
+                        <Path Data="{StaticResource FeatherChevronLeftGeometry}"
+                              Fill="Transparent"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                              StrokeThickness="1.8"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round"/>
+                    </Viewbox>
+                </Button>
+
                 <Button Command="{Binding ToggleTimerCommand}"
-                        CommandParameter="{Binding ActiveTh1ng}"
+                        CommandParameter="{Binding MiniDisplayedTh1ng}"
+                        Grid.Column="1"
                         VerticalAlignment="Center"
                         Padding="0"
                         ToolTip="Start or pause timer">
@@ -106,11 +165,11 @@
                         <Style BasedOn="{StaticResource CompletionIconButtonStyle}"
                                TargetType="Button">
                             <Setter Property="Width"
-                                    Value="30"/>
+                                    Value="34"/>
                             <Setter Property="Height"
-                                    Value="30"/>
+                                    Value="34"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ActiveTh1ng}"
+                                <DataTrigger Binding="{Binding MiniDisplayedTh1ng}"
                                              Value="{x:Null}">
                                     <Setter Property="IsEnabled"
                                             Value="False"/>
@@ -122,12 +181,12 @@
                     <Grid Width="15"
                           Height="15">
                         <Viewbox Width="15"
-                                 Height="15"
+                                 Height="17"
                                  Stretch="Uniform">
                             <Viewbox.Style>
                                 <Style TargetType="Viewbox">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ActiveTh1ng.IsTimerRunning}"
+                                        <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}"
                                                      Value="True">
                                             <Setter Property="Visibility"
                                                     Value="Collapsed"/>
@@ -144,15 +203,15 @@
                                   StrokeLineJoin="Round"/>
                         </Viewbox>
 
-                        <Viewbox Width="15"
-                                 Height="15"
+                        <Viewbox Width="17"
+                                 Height="17"
                                  Stretch="Uniform">
                             <Viewbox.Style>
                                 <Style TargetType="Viewbox">
                                     <Setter Property="Visibility"
                                             Value="Collapsed"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ActiveTh1ng.IsTimerRunning}"
+                                        <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}"
                                                      Value="True">
                                             <Setter Property="Visibility"
                                                     Value="Visible"/>
@@ -171,14 +230,35 @@
                     </Grid>
                 </Button>
 
-                <TextBlock Margin="8,0,0,0"
+                <TextBlock Grid.Column="2"
+                           Margin="8,0,0,0"
                            VerticalAlignment="Center"
-                           Text="{Binding ActiveTh1ng.ElapsedTimeText, TargetNullValue=--:--}"
+                           Text="{Binding MiniDisplayedTh1ng.ElapsedTimeText, TargetNullValue=--:--}"
                            FontFamily="Segoe UI Variable Small"
-                           FontSize="19"
+                           FontSize="27"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource AccentBrush}"/>
-            </StackPanel>
+
+                <Button Grid.Column="4"
+                        Width="28"
+                        Height="30"
+                        HorizontalAlignment="Right"
+                        Command="{Binding NextMiniTh1ngCommand}"
+                        Style="{StaticResource IconButtonStyle}"
+                        ToolTip="Next open th1ng">
+                    <Viewbox Width="16"
+                             Height="16"
+                             Stretch="Uniform">
+                        <Path Data="{StaticResource FeatherChevronRightGeometry}"
+                              Fill="Transparent"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                              StrokeThickness="1.8"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round"/>
+                    </Viewbox>
+                </Button>
+            </Grid>
         </Grid>
     </Border>
 </Window>
