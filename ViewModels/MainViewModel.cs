@@ -13,6 +13,7 @@ public partial class MainViewModel : ObservableObject
     private readonly Th1ngStore store;
     private readonly Func<Th1ng, Task<bool>> confirmDelete;
     private readonly Action<string> showError;
+    private readonly Func<Th1ng, Task> updateTh1ng;
     private readonly DispatcherTimer timer;
     private readonly TimeFormattingService timeFormattingService = new();
     private readonly TimeCopySettingsService timeCopySettingsService;
@@ -29,12 +30,14 @@ public partial class MainViewModel : ObservableObject
         Th1ngStore store,
         TimeCopySettingsService timeCopySettingsService,
         Func<Th1ng, Task<bool>>? confirmDelete = null,
-        Action<string>? showError = null)
+        Action<string>? showError = null,
+        Func<Th1ng, Task>? updateTh1ng = null)
     {
         this.store = store;
         this.timeCopySettingsService = timeCopySettingsService;
         this.confirmDelete = confirmDelete ?? (_ => Task.FromResult(false));
         this.showError = showError ?? (_ => { });
+        this.updateTh1ng = updateTh1ng ?? (th1ng => store.UpdateAsync(th1ng));
 
         timeCopySettings = timeCopySettingsService.Load();
 
@@ -70,7 +73,7 @@ public partial class MainViewModel : ObservableObject
         .Concat(DoneTh1ngs)
         .FirstOrDefault(th1ng => th1ng.IsTimerRunning);
 
-    public Th1ng? MiniDisplayedTh1ng => ActiveTh1ng ?? miniSelectedTh1ng;
+    public Th1ng? MiniDisplayedTh1ng => miniSelectedTh1ng ?? ActiveTh1ng;
 
     public IReadOnlyList<int> BillingIntervals { get; } =
     [
@@ -202,6 +205,20 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(MiniDisplayedTh1ng));
     }
 
+    public void SelectNextMiniTh1ng()
+    {
+        SelectAdjacentMiniTh1ng(1);
+    }
+
+    public Task ToggleSelectedMiniTimerAsync()
+    {
+        var th1ng = MiniDisplayedTh1ng;
+
+        return th1ng is null
+            ? Task.CompletedTask
+            : ToggleTimerAsync(th1ng);
+    }
+
     [RelayCommand]
     private void PreviousMiniTh1ng()
     {
@@ -296,11 +313,17 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task AddTh1ngAsync()
     {
-        var text = NewTh1ngText.Trim();
+        await AddTopLevelTh1ngAsync(NewTh1ngText);
+        NewTh1ngText = string.Empty;
+    }
+
+    public async Task<Th1ng?> AddTopLevelTh1ngAsync(string text)
+    {
+        text = text.Trim();
 
         if (text.Length == 0)
         {
-            return;
+            return null;
         }
 
         var th1ng = new Th1ng
@@ -315,11 +338,12 @@ public partial class MainViewModel : ObservableObject
 
             OpenTh1ngs.Add(th1ng);
             SaveOpenOrder();
-            NewTh1ngText = string.Empty;
+            return th1ng;
         }
         catch (Exception exception)
         {
             ReportError("The th1ng could not be saved.", exception);
+            return null;
         }
     }
 
@@ -411,7 +435,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await store.UpdateAsync(th1ng);
+            await updateTh1ng(th1ng);
             th1ng.IsEditing = false;
         }
         catch
@@ -471,7 +495,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await store.UpdateAsync(th1ng);
+            await updateTh1ng(th1ng);
 
             if (!th1ng.ParentId.HasValue)
             {
@@ -524,7 +548,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await store.UpdateAsync(th1ng);
+            await updateTh1ng(th1ng);
             OnPropertyChanged(nameof(ActiveTh1ng));
             OnPropertyChanged(nameof(MiniDisplayedTh1ng));
         }
@@ -584,7 +608,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await store.UpdateAsync(th1ng);
+            await updateTh1ng(th1ng);
             return true;
         }
         catch (Exception exception)
@@ -631,7 +655,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await store.UpdateAsync(th1ng);
+            await updateTh1ng(th1ng);
             OnPropertyChanged(nameof(ActiveTh1ng));
             OnPropertyChanged(nameof(MiniDisplayedTh1ng));
             return true;
@@ -770,7 +794,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await store.UpdateAsync(th1ng);
+            await updateTh1ng(th1ng);
             OnPropertyChanged(nameof(ActiveTh1ng));
             OnPropertyChanged(nameof(MiniDisplayedTh1ng));
             return true;

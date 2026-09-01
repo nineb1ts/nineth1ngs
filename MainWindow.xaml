@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:services="clr-namespace:nineth1ngs.Services"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         mc:Ignorable="d"
         Title="nineth1ngs"
         Width="520"
@@ -101,7 +102,11 @@
         </GeometryGroup>
 
         <GeometryGroup x:Key="FeatherMinimizeGeometry">
-            <PathGeometry Figures="M8,3 L3,3 L3,8 M16,3 L21,3 L21,8 M8,21 L3,21 L3,16 M16,21 L21,21 L21,16"/>
+            <PathGeometry Figures="
+                M3,8 L8,8 L8,3
+                M21,8 L16,8 L16,3
+                M3,16 L8,16 L8,21
+                M21,16 L16,16 L16,21"/>
         </GeometryGroup>
 
 
@@ -1265,10 +1270,10 @@
                     <Button Click="MinimizeClick"
                             Style="{StaticResource WindowButtonStyle}"
                             ToolTip="Minimize">
-                        <Path Data="{StaticResource MinimizeGeometry}"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                              StrokeThickness="1.4"
-                              StrokeStartLineCap="Round"/>
+                        <svgc:SvgViewbox Source="/nineth1ngs;component/Assets/Icons/minimize.svg"
+                                         Width="15"
+                                         Height="15"
+                                         Stretch="Uniform"/>
                     </Button>
 
                     <Button Click="MiniModeClick"
@@ -1285,14 +1290,6 @@
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"/>
                         </Viewbox>
-                    </Button>
-
-                    <Button Click="MaximizeClick"
-                            Style="{StaticResource WindowButtonStyle}"
-                            ToolTip="Maximize or restore">
-                        <Path Data="{StaticResource MaximizeGeometry}"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                              StrokeThickness="1.2"/>
                     </Button>
 
                     <Button Click="CloseClick"

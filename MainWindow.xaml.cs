@@ -17,7 +17,8 @@ namespace nineth1ngs;
 public partial class MainWindow : Window
 {
     private readonly WindowSettingsService settingsService;
-    private bool globalHotkeyRegistered;
+    private readonly Models.WindowSettings windowSettings;
+    private readonly HashSet<int> registeredGlobalHotkeyIds = [];
     private System.Windows.Point dragStartPoint;
     private Th1ng? draggedTh1ng;
     private Border? currentDropTarget;
@@ -28,6 +29,7 @@ public partial class MainWindow : Window
     private Th1ng? sessionLockedTimerTh1ng;
     private bool sessionTimeReviewOpen;
     private Views.MiniModeWindow? miniModeWindow;
+    private Views.QuickInputWindow? quickInputWindow;
 
     public MainWindow(
         Th1ngStore store,
@@ -37,6 +39,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         this.settingsService = settingsService;
+        windowSettings = settings;
 
         var timeCopySettingsService = new TimeCopySettingsService();
 
@@ -81,18 +84,18 @@ public partial class MainWindow : Window
                 "Automatic timer handling when the screen is locked will be unavailable.");
         }
 
-        globalHotkeyRegistered = RegisterHotKey(
-            windowHandle,
+        RegisterGlobalHotkey(
             GlobalHotkeyId,
-            ModControl | ModAlt,
-            VirtualKeyN);
-
-        if (!globalHotkeyRegistered)
-        {
-            ShowError(
-                "The global shortcut Ctrl + Alt + N could not be registered.\n\n" +
-                "Another application may already be using it.");
-        }
+            VirtualKeyN,
+            "Ctrl + Alt + N");
+        RegisterGlobalHotkey(
+            SelectTh1ngHotkeyId,
+            VirtualKeyRight,
+            "Ctrl + Alt + Right");
+        RegisterGlobalHotkey(
+            ToggleTimerHotkeyId,
+            VirtualKeySpace,
+            "Ctrl + Alt + Space");
 
         if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
         {
@@ -118,11 +121,12 @@ public partial class MainWindow : Window
             sessionNotificationsRegistered = false;
         }
 
-        if (globalHotkeyRegistered)
+        foreach (var hotkeyId in registeredGlobalHotkeyIds)
         {
-            _ = UnregisterHotKey(windowHandle, GlobalHotkeyId);
-            globalHotkeyRegistered = false;
+            _ = UnregisterHotKey(windowHandle, hotkeyId);
         }
+
+        registeredGlobalHotkeyIds.Clear();
 
         base.OnClosed(e);
     }
@@ -154,15 +158,12 @@ public partial class MainWindow : Window
     {
         try
         {
+            quickInputWindow?.Close();
+            quickInputWindow = null;
+
             await ((MainViewModel)DataContext).PauseRunningTimersAsync();
 
-            settingsService.Save(new Models.WindowSettings
-            {
-                Width = Width,
-                Height = Height,
-                Left = Left,
-                Top = Top
-            });
+            SaveWindowSettings();
         }
         catch (Exception exception)
         {
@@ -302,13 +303,19 @@ public partial class MainWindow : Window
 
         var miniWindow = new Views.MiniModeWindow(
             viewModel,
-            ReturnToNormalMode);
+            ReturnToNormalMode,
+            Close);
 
         miniModeWindow = miniWindow;
         miniWindow.Closed += MiniModeWindowClosed;
-        miniWindow.Left = Left + 16;
-        miniWindow.Top = Top + 16;
+        var initialMiniPosition = WindowSettingsService.IsValidMiniPosition(windowSettings)
+            ? new System.Windows.Point(windowSettings.MiniLeft!.Value, windowSettings.MiniTop!.Value)
+            : new System.Windows.Point(Left + 16, Top + 16);
+
+        miniWindow.Left = initialMiniPosition.X;
+        miniWindow.Top = initialMiniPosition.Y;
         miniWindow.Show();
+        miniWindow.KeepOnWorkingArea();
 
         Hide();
         miniWindow.Activate();
@@ -323,6 +330,7 @@ public partial class MainWindow : Window
             return;
         }
 
+        SaveMiniWindowPosition(miniWindow);
         miniModeWindow = null;
         miniWindow.Close();
         Show();
@@ -338,9 +346,88 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (sender is Views.MiniModeWindow miniWindow)
+        {
+            SaveMiniWindowPosition(miniWindow);
+        }
+
         miniModeWindow = null;
         Show();
         Activate();
+    }
+
+    private void SaveWindowSettings()
+    {
+        windowSettings.Width = Width;
+        windowSettings.Height = Height;
+        windowSettings.Left = Left;
+        windowSettings.Top = Top;
+
+        if (miniModeWindow is not null)
+        {
+            SaveMiniWindowPosition(miniModeWindow);
+        }
+
+        settingsService.Save(windowSettings);
+    }
+
+    private void SaveMiniWindowPosition(Views.MiniModeWindow miniWindow)
+    {
+        windowSettings.MiniLeft = miniWindow.Left;
+        windowSettings.MiniTop = miniWindow.Top;
+    }
+
+    private void RegisterGlobalHotkey(
+        int id,
+        uint virtualKey,
+        string shortcut)
+    {
+        var windowHandle = new WindowInteropHelper(this).Handle;
+
+        if (RegisterHotKey(
+                windowHandle,
+                id,
+                ModControl | ModAlt,
+                virtualKey))
+        {
+            registeredGlobalHotkeyIds.Add(id);
+            return;
+        }
+
+        ShowError(
+            $"The global shortcut {shortcut} could not be registered.\n\n" +
+            "Another application may already be using it.");
+    }
+
+    private async Task CreateQuickInputAsync(string text)
+    {
+        if (DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        var th1ng = await viewModel.AddTopLevelTh1ngAsync(text);
+
+        if (th1ng is not null)
+        {
+            viewModel.SelectMiniTh1ng(th1ng);
+        }
+    }
+
+    private void ShowMiniQuickInput()
+    {
+        if (miniModeWindow is null || quickInputWindow is not null)
+        {
+            return;
+        }
+
+        var inputWindow = miniModeWindow.CreateQuickInput(
+            CreateQuickInputAsync);
+
+        quickInputWindow = inputWindow;
+        inputWindow.Closed += (_, _) => quickInputWindow = null;
+        inputWindow.Show();
+        inputWindow.Activate();
     }
 
     private void TitleBarMouseLeftButtonDown(
@@ -349,12 +436,6 @@ public partial class MainWindow : Window
     {
         if (e.ChangedButton != MouseButton.Left)
         {
-            return;
-        }
-
-        if (e.ClickCount == 2)
-        {
-            ToggleMaximize();
             return;
         }
 
@@ -604,25 +685,11 @@ public partial class MainWindow : Window
         WindowState = WindowState.Minimized;
     }
 
-    private void MaximizeClick(
-        object sender,
-        RoutedEventArgs e)
-    {
-        ToggleMaximize();
-    }
-
     private void CloseClick(
         object sender,
         RoutedEventArgs e)
     {
         Close();
-    }
-
-    private void ToggleMaximize()
-    {
-        WindowState = WindowState == WindowState.Maximized
-            ? WindowState.Normal
-            : WindowState.Maximized;
     }
 
     private static bool IsDragBlockedElement(
@@ -789,10 +856,32 @@ public partial class MainWindow : Window
             }
         }
 
-        if (msg == WmHotkey &&
-            wParam.ToInt32() == GlobalHotkeyId)
+        if (msg == WmHotkey)
         {
-            FocusNewTh1ngInput();
+            if (DataContext is MainViewModel viewModel)
+            {
+                switch (wParam.ToInt32())
+                {
+                    case GlobalHotkeyId:
+                        if (miniModeWindow is null)
+                        {
+                            FocusNewTh1ngInput();
+                        }
+                        else
+                        {
+                            ShowMiniQuickInput();
+                        }
+
+                        break;
+                    case SelectTh1ngHotkeyId:
+                        viewModel.SelectNextMiniTh1ng();
+                        break;
+                    case ToggleTimerHotkeyId:
+                        _ = viewModel.ToggleSelectedMiniTimerAsync();
+                        break;
+                }
+            }
+
             handled = true;
             return IntPtr.Zero;
         }
@@ -859,6 +948,8 @@ public partial class MainWindow : Window
     }
 
     private const int GlobalHotkeyId = 9001;
+    private const int SelectTh1ngHotkeyId = 9002;
+    private const int ToggleTimerHotkeyId = 9003;
 
     private const int WmHotkey = 0x0312;
     private const int WmGetMinMaxInfo = 0x0024;
@@ -871,6 +962,8 @@ public partial class MainWindow : Window
     private const uint ModAlt = 0x0001;
     private const uint ModControl = 0x0002;
     private const uint VirtualKeyN = 0x4E;
+    private const uint VirtualKeyRight = 0x27;
+    private const uint VirtualKeySpace = 0x20;
 
     private const int MonitorDefaultToNearest = 0x00000002;
     private const int DwmWindowCornerPreferenceAttribute = 33;

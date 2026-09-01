@@ -39,9 +39,21 @@ public sealed class WindowSettingsService
                 File.ReadAllText(settingsPath),
                 JsonOptions);
 
-            return IsValid(settings) && IsVisible(settings!)
-                ? settings!
-                : new WindowSettings();
+            if (settings is null)
+            {
+                return new WindowSettings();
+            }
+
+            if (IsValid(settings) && IsVisible(settings))
+            {
+                return settings;
+            }
+
+            return new WindowSettings
+            {
+                MiniLeft = settings.MiniLeft,
+                MiniTop = settings.MiniTop
+            };
         }
         catch (JsonException)
         {
@@ -89,4 +101,10 @@ public sealed class WindowSettingsService
 
         return virtualScreen.IntersectsWith(windowBounds);
     }
+
+    public static bool IsValidMiniPosition(WindowSettings? settings) =>
+        settings?.MiniLeft is double left &&
+        settings.MiniTop is double top &&
+        double.IsFinite(left) &&
+        double.IsFinite(top);
 }

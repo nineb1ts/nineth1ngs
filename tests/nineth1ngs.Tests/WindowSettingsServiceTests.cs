@@ -44,6 +44,64 @@ public sealed class WindowSettingsServiceTests
         Assert.False(WindowSettingsService.IsVisible(settings));
     }
 
+    [Fact]
+    public void IsValidMiniPosition_RejectsNonFiniteCoordinates()
+    {
+        var settings = new WindowSettings
+        {
+            MiniLeft = double.NaN,
+            MiniTop = 20
+        };
+
+        Assert.False(WindowSettingsService.IsValidMiniPosition(settings));
+    }
+
+    [Fact]
+    public void SnapToWorkingArea_SnapsEachEdgeWithinDistance()
+    {
+        var workingArea = new Rect(100, 50, 800, 500);
+        var windowSize = new Size(200, 100);
+
+        var position = MiniModeLayoutService.SnapToWorkingArea(
+            new Point(105, 445),
+            windowSize,
+            workingArea);
+
+        Assert.Equal(100, position.X);
+        Assert.Equal(450, position.Y);
+    }
+
+    [Fact]
+    public void SnapToWorkingArea_ClampsNegativeMonitorCoordinates()
+    {
+        var workingArea = new Rect(-1920, 0, 1920, 1080);
+        var windowSize = new Size(360, 86);
+
+        var position = MiniModeLayoutService.SnapToWorkingArea(
+            new Point(-2000, -40),
+            windowSize,
+            workingArea);
+
+        Assert.Equal(-1920, position.X);
+        Assert.Equal(0, position.Y);
+    }
+
+    [Fact]
+    public void GetQuickInputPosition_UsesAboveWhenBelowDoesNotFit()
+    {
+        var miniBounds = new Rect(300, 700, 440, 86);
+        var inputSize = new Size(440, 52);
+        var workingArea = new Rect(0, 0, 1200, 768);
+
+        var position = MiniModeLayoutService.GetQuickInputPosition(
+            miniBounds,
+            inputSize,
+            workingArea);
+
+        Assert.Equal(300, position.X);
+        Assert.Equal(644, position.Y);
+    }
+
     private static string CreateTemporarySettingsFile(string content)
     {
         var path = Path.Combine(Path.GetTempPath(), $"nineth1ngs-tests-{Guid.NewGuid():N}.json");

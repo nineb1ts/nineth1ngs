@@ -2,11 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         Title="nineth1ngs mini mode"
-        Width="360"
-        Height="118"
-        MinWidth="320"
-        MinHeight="106"
+        Width="440"
+        Height="86"
+        MinWidth="360"
+        MinHeight="86"
         Background="Transparent"
         Foreground="{StaticResource PrimaryTextBrush}"
         WindowStyle="None"
@@ -19,35 +20,77 @@
 
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="0"
-                            ResizeBorderThickness="6"
+                            ResizeBorderThickness="0"
                             GlassFrameThickness="0"
                             CornerRadius="8"/>
     </shell:WindowChrome.WindowChrome>
 
     <Window.Resources>
+        <Style x:Key="MiniTimerButtonStyle"
+               BasedOn="{StaticResource AddButtonStyle}"
+               TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="TimerButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="20">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="TimerButtonBorder"
+                                        Property="Background"
+                                        Value="{StaticResource AccentHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter TargetName="TimerButtonBorder"
+                                        Property="Background"
+                                        Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="TimerButtonBorder"
+                                        Property="Opacity"
+                                        Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding MiniDisplayedTh1ng}"
+                             Value="{x:Null}">
+                    <Setter Property="IsEnabled"
+                            Value="False"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <GeometryGroup x:Key="FeatherPlayGeometry">
             <PathGeometry Figures="M5,3 L19,12 L5,21 Z"/>
         </GeometryGroup>
-
         <GeometryGroup x:Key="FeatherPauseGeometry">
-            <RectangleGeometry Rect="6,4,4,16"
-                               RadiusX="1"
-                               RadiusY="1"/>
-            <RectangleGeometry Rect="14,4,4,16"
-                               RadiusX="1"
-                               RadiusY="1"/>
+            <RectangleGeometry Rect="6,4,4,16" RadiusX="1" RadiusY="1"/>
+            <RectangleGeometry Rect="14,4,4,16" RadiusX="1" RadiusY="1"/>
         </GeometryGroup>
-
-        <GeometryGroup x:Key="FeatherExpandGeometry">
-            <PathGeometry Figures="M8,3 L3,3 L3,8 M16,3 L21,3 L21,8 M8,21 L3,21 L3,16 M16,21 L21,21 L21,16"/>
+        <GeometryGroup x:Key="FeatherXGeometry">
+            <PathGeometry Figures="M18,6 L6,18 M6,6 L18,18"/>
         </GeometryGroup>
-
-        <GeometryGroup x:Key="FeatherChevronLeftGeometry">
-            <PathGeometry Figures="M15,18 L9,12 L15,6"/>
-        </GeometryGroup>
-
-        <GeometryGroup x:Key="FeatherChevronRightGeometry">
-            <PathGeometry Figures="M9,18 L15,12 L9,6"/>
+        <GeometryGroup x:Key="FeatherGripGeometry">
+            <EllipseGeometry Center="8,7" RadiusX="1.2" RadiusY="1.2"/>
+            <EllipseGeometry Center="16,7" RadiusX="1.2" RadiusY="1.2"/>
+            <EllipseGeometry Center="8,12" RadiusX="1.2" RadiusY="1.2"/>
+            <EllipseGeometry Center="16,12" RadiusX="1.2" RadiusY="1.2"/>
+            <EllipseGeometry Center="8,17" RadiusX="1.2" RadiusY="1.2"/>
+            <EllipseGeometry Center="16,17" RadiusX="1.2" RadiusY="1.2"/>
+            <EllipseGeometry Center="8,22" RadiusX="1.2" RadiusY="1.2"/>
+            <EllipseGeometry Center="16,22" RadiusX="1.2" RadiusY="1.2"/>
         </GeometryGroup>
     </Window.Resources>
 
@@ -55,210 +98,152 @@
             BorderBrush="{StaticResource BorderBrush}"
             BorderThickness="1"
             CornerRadius="10">
-        <Grid Margin="14,8,12,10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="24"/>
-                <RowDefinition Height="42"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="42"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="64"/>
+            </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="0">
-                <Border Background="Transparent"
-                        MouseLeftButtonDown="MiniHeaderMouseLeftButtonDown"/>
+            <Border x:Name="RailHoverZone"
+                    Grid.Column="0"
+                    Background="Transparent"
+                    MouseEnter="RailHoverZoneMouseEnter"
+                    MouseLeave="RailHoverZoneMouseLeave"
+                    MouseLeftButtonDown="MiniDragAreaMouseLeftButtonDown">
+                <Grid x:Name="RailControls"
+                      Opacity="0"
+                      IsHitTestVisible="False"
+                      RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <TranslateTransform X="-8"/>
+                    </Grid.RenderTransform>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                <Button Width="30"
-                        Height="30"
-                        HorizontalAlignment="Right"
+                    <Button Grid.Row="0"
+                        Width="26"
+                        Height="26"
+                        HorizontalAlignment="Center"
                         VerticalAlignment="Top"
-                        Click="ReturnToNormalClick"
-                        Style="{StaticResource IconButtonStyle}"
-                        ToolTip="Return to normal mode">
-                    <Viewbox Width="17"
-                             Height="17"
-                             Stretch="Uniform">
-                        <Path Data="{StaticResource FeatherExpandGeometry}"
-                              Fill="Transparent"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                              StrokeThickness="1.7"
-                              StrokeStartLineCap="Round"
-                              StrokeEndLineCap="Round"
-                              StrokeLineJoin="Round"/>
+                        Click="CloseApplicationClick"
+                        ToolTip="Close nineth1ngs"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        Focusable="False">
+                    <Viewbox Width="14"
+                            Height="14">
+                        <Path Data="{StaticResource FeatherXGeometry}"
+                            Stroke="{StaticResource AccentBrush}"
+                            StrokeThickness="1.8"
+                            StrokeStartLineCap="Round"
+                            StrokeEndLineCap="Round"/>
                     </Viewbox>
                 </Button>
-            </Grid>
 
-            <Grid Grid.Row="1"
-                  Margin="0,0,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                    <Button Grid.Row="1"
+                            Width="26"
+                            Height="26"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Click="ReturnToNormalClick"
+                            Style="{StaticResource IconButtonStyle}"
+                            ToolTip="Return to normal mode">
+                        <svgc:SvgViewbox Source="/nineth1ngs;component/Assets/Icons/maximize.svg"
+                                         Width="15"
+                                         Height="15"
+                                         Stretch="Uniform"/>
+                    </Button>
 
-                <StackPanel Orientation="Vertical"
-                            VerticalAlignment="Center">
-                    <TextBlock
-                           VerticalAlignment="Center"
-                           Text="{Binding MiniDisplayedTh1ng.Text, TargetNullValue=No active th1ng}"
+                    <Viewbox Grid.Row="2"
+                             Width="18"
+                             Height="24"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Bottom"
+                             Margin="0,0,0,10">
+                        <Path Data="{StaticResource FeatherGripGeometry}"
+                              Fill="{StaticResource AccentBrush}"/>
+                    </Viewbox>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1"
+                  Margin="4,11,6,10"
+                  VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0"
+                           Text="{Binding MiniDisplayedTh1ng.Text, TargetNullValue=No open th1ngs}"
                            TextTrimming="CharacterEllipsis"
                            FontFamily="Segoe UI Variable Small"
-                           FontSize="17"
+                           FontSize="15"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource PrimaryTextBrush}"/>
+                <TextBlock Grid.Row="1"
+                           Margin="0,3,0,0"
+                           Text="{Binding MiniDisplayedTh1ng.ElapsedTimeText, TargetNullValue=--:--}"
+                           FontFamily="Segoe UI Variable Small"
+                           FontSize="23"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentBrush}"/>
+            </Grid>
 
-                    <TextBlock Text="Use &lt; and &gt; to choose one"
-                               FontFamily="Segoe UI Variable Small"
-                               FontSize="10"
-                               Foreground="{StaticResource MutedTextBrush}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility"
-                                        Value="Collapsed"/>
+            <Button Grid.Column="2"
+                    Width="38"
+                    Height="38"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Command="{Binding ToggleTimerCommand}"
+                    CommandParameter="{Binding MiniDisplayedTh1ng}"
+                    Style="{StaticResource MiniTimerButtonStyle}"
+                    ToolTip="Start or pause timer">
+                <Grid Width="16" Height="18">
+                    <Viewbox Stretch="Uniform">
+                        <Viewbox.Style>
+                            <Style TargetType="Viewbox">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding MiniDisplayedTh1ng}"
-                                                 Value="{x:Null}">
-                                        <Setter Property="Visibility"
-                                                Value="Visible"/>
+                                    <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </StackPanel>
-            </Grid>
-
-            <Grid Grid.Row="2"
-                  Margin="-5,0,-5,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Button Grid.Column="0"
-                        Width="28"
-                        Height="30"
-                        HorizontalAlignment="Left"
-                        Command="{Binding PreviousMiniTh1ngCommand}"
-                        Style="{StaticResource IconButtonStyle}"
-                        ToolTip="Previous open th1ng">
-                    <Viewbox Width="16"
-                             Height="16"
-                             Stretch="Uniform">
-                        <Path Data="{StaticResource FeatherChevronLeftGeometry}"
+                        </Viewbox.Style>
+                        <Path Data="{StaticResource FeatherPlayGeometry}"
                               Fill="Transparent"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                              Stroke="{StaticResource WindowBackgroundBrush}"
                               StrokeThickness="1.8"
                               StrokeStartLineCap="Round"
                               StrokeEndLineCap="Round"
                               StrokeLineJoin="Round"/>
                     </Viewbox>
-                </Button>
-
-                <Button Command="{Binding ToggleTimerCommand}"
-                        CommandParameter="{Binding MiniDisplayedTh1ng}"
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Padding="0"
-                        ToolTip="Start or pause timer">
-                    <Button.Style>
-                        <Style BasedOn="{StaticResource CompletionIconButtonStyle}"
-                               TargetType="Button">
-                            <Setter Property="Width"
-                                    Value="34"/>
-                            <Setter Property="Height"
-                                    Value="34"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding MiniDisplayedTh1ng}"
-                                             Value="{x:Null}">
-                                    <Setter Property="IsEnabled"
-                                            Value="False"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-
-                    <Grid Width="15"
-                          Height="15">
-                        <Viewbox Width="15"
-                                 Height="17"
-                                 Stretch="Uniform">
-                            <Viewbox.Style>
-                                <Style TargetType="Viewbox">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}"
-                                                     Value="True">
-                                            <Setter Property="Visibility"
-                                                    Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Viewbox.Style>
-                            <Path Data="{StaticResource FeatherPlayGeometry}"
-                                  Fill="Transparent"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.8"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round"/>
-                        </Viewbox>
-
-                        <Viewbox Width="17"
-                                 Height="17"
-                                 Stretch="Uniform">
-                            <Viewbox.Style>
-                                <Style TargetType="Viewbox">
-                                    <Setter Property="Visibility"
-                                            Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}"
-                                                     Value="True">
-                                            <Setter Property="Visibility"
-                                                    Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Viewbox.Style>
-                            <Path Data="{StaticResource FeatherPauseGeometry}"
-                                  Fill="Transparent"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
-                                  StrokeThickness="1.8"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round"/>
-                        </Viewbox>
-                    </Grid>
-                </Button>
-
-                <TextBlock Grid.Column="2"
-                           Margin="8,0,0,0"
-                           VerticalAlignment="Center"
-                           Text="{Binding MiniDisplayedTh1ng.ElapsedTimeText, TargetNullValue=--:--}"
-                           FontFamily="Segoe UI Variable Small"
-                           FontSize="27"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource AccentBrush}"/>
-
-                <Button Grid.Column="4"
-                        Width="28"
-                        Height="30"
-                        HorizontalAlignment="Right"
-                        Command="{Binding NextMiniTh1ngCommand}"
-                        Style="{StaticResource IconButtonStyle}"
-                        ToolTip="Next open th1ng">
-                    <Viewbox Width="16"
-                             Height="16"
-                             Stretch="Uniform">
-                        <Path Data="{StaticResource FeatherChevronRightGeometry}"
+                    <Viewbox Stretch="Uniform">
+                        <Viewbox.Style>
+                            <Style TargetType="Viewbox">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Viewbox.Style>
+                        <Path Data="{StaticResource FeatherPauseGeometry}"
                               Fill="Transparent"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                              Stroke="{StaticResource WindowBackgroundBrush}"
                               StrokeThickness="1.8"
                               StrokeStartLineCap="Round"
-                              StrokeEndLineCap="Round"
-                              StrokeLineJoin="Round"/>
+                              StrokeEndLineCap="Round"/>
                     </Viewbox>
-                </Button>
-            </Grid>
+                </Grid>
+            </Button>
+
         </Grid>
     </Border>
 </Window>
