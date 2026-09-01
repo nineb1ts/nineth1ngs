@@ -76,21 +76,41 @@
             <PathGeometry Figures="M5,3 L19,12 L5,21 Z"/>
         </GeometryGroup>
         <GeometryGroup x:Key="FeatherPauseGeometry">
-            <RectangleGeometry Rect="6,4,4,16" RadiusX="1" RadiusY="1"/>
-            <RectangleGeometry Rect="14,4,4,16" RadiusX="1" RadiusY="1"/>
+            <RectangleGeometry Rect="6,4,4,16"
+                               RadiusX="1"
+                               RadiusY="1"/>
+            <RectangleGeometry Rect="14,4,4,16"
+                               RadiusX="1"
+                               RadiusY="1"/>
         </GeometryGroup>
         <GeometryGroup x:Key="FeatherXGeometry">
             <PathGeometry Figures="M18,6 L6,18 M6,6 L18,18"/>
         </GeometryGroup>
         <GeometryGroup x:Key="FeatherGripGeometry">
-            <EllipseGeometry Center="8,7" RadiusX="1.2" RadiusY="1.2"/>
-            <EllipseGeometry Center="16,7" RadiusX="1.2" RadiusY="1.2"/>
-            <EllipseGeometry Center="8,12" RadiusX="1.2" RadiusY="1.2"/>
-            <EllipseGeometry Center="16,12" RadiusX="1.2" RadiusY="1.2"/>
-            <EllipseGeometry Center="8,17" RadiusX="1.2" RadiusY="1.2"/>
-            <EllipseGeometry Center="16,17" RadiusX="1.2" RadiusY="1.2"/>
-            <EllipseGeometry Center="8,22" RadiusX="1.2" RadiusY="1.2"/>
-            <EllipseGeometry Center="16,22" RadiusX="1.2" RadiusY="1.2"/>
+            <EllipseGeometry Center="8,7"
+                             RadiusX="1.2"
+                             RadiusY="1.2"/>
+            <EllipseGeometry Center="16,7"
+                             RadiusX="1.2"
+                             RadiusY="1.2"/>
+            <EllipseGeometry Center="8,12"
+                             RadiusX="1.2"
+                             RadiusY="1.2"/>
+            <EllipseGeometry Center="16,12"
+                             RadiusX="1.2"
+                             RadiusY="1.2"/>
+            <EllipseGeometry Center="8,17"
+                             RadiusX="1.2"
+                             RadiusY="1.2"/>
+            <EllipseGeometry Center="16,17"
+                             RadiusX="1.2"
+                             RadiusY="1.2"/>
+            <EllipseGeometry Center="8,22"
+                             RadiusX="1.2"
+                             RadiusY="1.2"/>
+            <EllipseGeometry Center="16,22"
+                             RadiusX="1.2"
+                             RadiusY="1.2"/>
         </GeometryGroup>
     </Window.Resources>
 
@@ -125,26 +145,39 @@
                     </Grid.RowDefinitions>
 
                     <Button Grid.Row="0"
-                        Width="26"
-                        Height="26"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        Click="CloseApplicationClick"
-                        ToolTip="Close nineth1ngs"
-                        Background="Transparent"
-                        BorderBrush="Transparent"
-                        BorderThickness="0"
-                        Padding="0"
-                        Focusable="False">
-                    <Viewbox Width="14"
-                            Height="14">
-                        <Path Data="{StaticResource FeatherXGeometry}"
-                            Stroke="{StaticResource AccentBrush}"
-                            StrokeThickness="1.8"
-                            StrokeStartLineCap="Round"
-                            StrokeEndLineCap="Round"/>
-                    </Viewbox>
-                </Button>
+                            Width="26"
+                            Height="26"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Click="CloseApplicationClick"
+                            ToolTip="Close nineth1ngs"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Focusable="False"
+                            Cursor="Hand">
+
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Grid Background="Transparent">
+                                    <ContentPresenter
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Margin="-3,0,0,0"/>
+                                </Grid>
+                            </ControlTemplate>
+                        </Button.Template>
+
+                        <Viewbox Width="14"
+                                 Height="14">
+                            <Path Data="{StaticResource FeatherXGeometry}"
+                                  Stroke="{StaticResource AccentBrush}"
+                                  StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"/>
+                        </Viewbox>
+                    </Button>
 
                     <Button Grid.Row="1"
                             Width="26"
@@ -165,7 +198,7 @@
                              Height="24"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Bottom"
-                             Margin="0,0,0,10">
+                             Margin="-8,0,0,10">
                         <Path Data="{StaticResource FeatherGripGeometry}"
                               Fill="{StaticResource AccentBrush}"/>
                     </Viewbox>
@@ -204,13 +237,16 @@
                     CommandParameter="{Binding MiniDisplayedTh1ng}"
                     Style="{StaticResource MiniTimerButtonStyle}"
                     ToolTip="Start or pause timer">
-                <Grid Width="16" Height="18">
+                <Grid Width="16"
+                      Height="18">
                     <Viewbox Stretch="Uniform">
                         <Viewbox.Style>
                             <Style TargetType="Viewbox">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}"
+                                                 Value="True">
+                                        <Setter Property="Visibility"
+                                                Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -226,10 +262,13 @@
                     <Viewbox Stretch="Uniform">
                         <Viewbox.Style>
                             <Style TargetType="Viewbox">
-                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Visibility"
+                                        Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible"/>
+                                    <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}"
+                                                 Value="True">
+                                        <Setter Property="Visibility"
+                                                Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
