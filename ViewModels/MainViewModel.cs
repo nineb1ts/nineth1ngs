@@ -21,6 +21,7 @@ public partial class MainViewModel : ObservableObject
     private readonly Th1ngOrderService th1ngOrderService = new();
     private string previousSection = "th1ngs";
     private Th1ng? miniSelectedTh1ng;
+    private Th1ng? sessionLockedSubTh1ng;
     public string RoundUpThresholdHint => $"Choose a value from 1 to {BillingIntervalMinutes - 1} minutes.";
 
     public IReadOnlyList<int> RoundUpThresholds =>
@@ -479,6 +480,13 @@ public partial class MainViewModel : ObservableObject
         var previousElapsedSeconds = th1ng.ElapsedSeconds;
         var previousTimerStartedAt = th1ng.TimerStartedAt;
 
+        if (!th1ng.IsCompleted &&
+            !th1ng.ParentId.HasValue &&
+            !await PauseRunningSubTimersAsync(th1ng))
+        {
+            return;
+        }
+
         th1ng.IsCompleted = !previousIsCompleted;
         th1ng.CompletedAt = th1ng.IsCompleted
             ? DateTime.UtcNow
@@ -520,22 +528,44 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task ToggleTimerAsync(Th1ng th1ng)
     {
-        if (th1ng.ParentId.HasValue || th1ng.IsCompleted)
+        if (th1ng.IsCompleted)
         {
+            return;
+        }
+
+        if (th1ng.ParentId.HasValue)
+        {
+            await ToggleSubTimerAsync(th1ng);
             return;
         }
 
         if (th1ng.IsTimerRunning)
         {
+            if (!await PauseRunningSubTimersAsync(th1ng))
+            {
+                return;
+            }
+
             _ = await PauseTimerAsync(th1ng);
             return;
+        }
+
+        foreach (var runningSubTh1ng in GetSubTh1ngs()
+                     .Where(candidate => candidate.IsTimerRunning)
+                     .ToList())
+        {
+            if (!await PauseTimerAsync(runningSubTh1ng))
+            {
+                return;
+            }
         }
 
         foreach (var runningTh1ng in OpenTh1ngs
                      .Concat(DoneTh1ngs)
                      .Where(candidate =>
                          candidate.IsTimerRunning &&
-                         !ReferenceEquals(candidate, th1ng)))
+                         !ReferenceEquals(candidate, th1ng))
+                     .ToList())
         {
             if (!await PauseTimerAsync(runningTh1ng))
             {
@@ -543,29 +573,83 @@ public partial class MainViewModel : ObservableObject
             }
         }
 
-        var previousTimerStartedAt = th1ng.TimerStartedAt;
-        th1ng.TimerStartedAt = DateTime.UtcNow;
+        _ = await StartTimerAsync(th1ng);
+    }
 
-        try
+    public Task ToggleSubTh1ngTimerAsync(Th1ng subTh1ng)
+    {
+        return ToggleSubTimerAsync(subTh1ng);
+    }
+
+    private async Task ToggleSubTimerAsync(Th1ng subTh1ng)
+    {
+        if (!subTh1ng.ParentId.HasValue ||
+            subTh1ng.IsCompleted)
         {
-            await updateTh1ng(th1ng);
-            OnPropertyChanged(nameof(ActiveTh1ng));
-            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
+            return;
         }
-        catch (Exception exception)
+
+        var parent = FindParent(subTh1ng);
+
+        if (parent is null ||
+            parent.IsCompleted)
         {
-            th1ng.TimerStartedAt = previousTimerStartedAt;
-            OnPropertyChanged(nameof(ActiveTh1ng));
-            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
-            ReportError("The timer could not be started.", exception);
+            return;
         }
+
+        if (subTh1ng.IsTimerRunning)
+        {
+            _ = await PauseTimerAsync(subTh1ng);
+            return;
+        }
+
+        foreach (var runningSubTh1ng in GetSubTh1ngs()
+                     .Where(candidate =>
+                         candidate.IsTimerRunning &&
+                         !ReferenceEquals(candidate, subTh1ng))
+                     .ToList())
+        {
+            if (!await PauseTimerAsync(runningSubTh1ng))
+            {
+                return;
+            }
+        }
+
+        foreach (var runningTh1ng in OpenTh1ngs
+                     .Concat(DoneTh1ngs)
+                     .Where(candidate =>
+                         candidate.IsTimerRunning &&
+                         !ReferenceEquals(candidate, parent))
+                     .ToList())
+        {
+            if (!await PauseTimerAsync(runningTh1ng))
+            {
+                return;
+            }
+        }
+
+        if (!parent.IsTimerRunning &&
+            !await StartTimerAsync(parent))
+        {
+            return;
+        }
+
+        _ = await StartTimerAsync(subTh1ng);
     }
 
     public async Task PauseRunningTimersAsync()
     {
+        foreach (var subTh1ng in GetSubTh1ngs()
+                     .Where(th1ng => th1ng.IsTimerRunning)
+                     .ToList())
+        {
+            await PauseTimerAsync(subTh1ng);
+        }
+
         foreach (var th1ng in OpenTh1ngs
                      .Concat(DoneTh1ngs)
-                     .Where(th1ng => th1ng.IsTimerRunning))
+                     .Where(th1ng => th1ng.IsTimerRunning)
+                     .ToList())
         {
             await PauseTimerAsync(th1ng);
         }
@@ -580,14 +664,31 @@ public partial class MainViewModel : ObservableObject
 
         if (runningTh1ng is null)
         {
+            sessionLockedSubTh1ng = null;
             return null;
         }
 
-        return await PauseTimerAsync(
-            runningTh1ng,
-            lockedAtUtc)
-            ? runningTh1ng
-            : null;
+        sessionLockedSubTh1ng = runningTh1ng.SubTh1ngs
+            .FirstOrDefault(subTh1ng => subTh1ng.IsTimerRunning);
+
+        if (sessionLockedSubTh1ng is not null &&
+            !await PauseTimerAsync(
+                sessionLockedSubTh1ng,
+                lockedAtUtc))
+        {
+            sessionLockedSubTh1ng = null;
+            return null;
+        }
+
+        if (!await PauseTimerAsync(
+                runningTh1ng,
+                lockedAtUtc))
+        {
+            sessionLockedSubTh1ng = null;
+            return null;
+        }
+
+        return runningTh1ng;
     }
 
     public async Task<bool> AddElapsedTimeAsync(
@@ -633,45 +734,62 @@ public partial class MainViewModel : ObservableObject
             th1ng.IsCompleted ||
             th1ng.IsTimerRunning)
         {
+            sessionLockedSubTh1ng = null;
             return false;
+        }
+
+        foreach (var runningSubTh1ng in GetSubTh1ngs()
+                     .Where(candidate => candidate.IsTimerRunning)
+                     .ToList())
+        {
+            if (!await PauseTimerAsync(
+                    runningSubTh1ng,
+                    resumedAtUtc))
+            {
+                sessionLockedSubTh1ng = null;
+                return false;
+            }
         }
 
         foreach (var runningTh1ng in OpenTh1ngs
                      .Concat(DoneTh1ngs)
                      .Where(candidate =>
                          candidate.IsTimerRunning &&
-                         !ReferenceEquals(candidate, th1ng)))
+                         !ReferenceEquals(candidate, th1ng))
+                     .ToList())
         {
             if (!await PauseTimerAsync(
                     runningTh1ng,
                     resumedAtUtc))
             {
+                sessionLockedSubTh1ng = null;
                 return false;
             }
         }
 
-        var previousTimerStartedAt = th1ng.TimerStartedAt;
-        th1ng.TimerStartedAt = resumedAtUtc;
-
-        try
+        if (!await StartTimerAsync(
+                th1ng,
+                resumedAtUtc,
+                "The timer could not be resumed after unlocking Windows."))
         {
-            await updateTh1ng(th1ng);
-            OnPropertyChanged(nameof(ActiveTh1ng));
-            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
-            return true;
-        }
-        catch (Exception exception)
-        {
-            th1ng.TimerStartedAt = previousTimerStartedAt;
-            OnPropertyChanged(nameof(ActiveTh1ng));
-            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
-
-            ReportError(
-                "The timer could not be resumed after unlocking Windows.",
-                exception);
-
+            sessionLockedSubTh1ng = null;
             return false;
         }
+
+        var subTh1ngToResume = sessionLockedSubTh1ng;
+        sessionLockedSubTh1ng = null;
+
+        if (subTh1ngToResume is null ||
+            subTh1ngToResume.IsCompleted ||
+            !th1ng.SubTh1ngs.Contains(subTh1ngToResume))
+        {
+            return true;
+        }
+
+        return await StartTimerAsync(
+            subTh1ngToResume,
+            resumedAtUtc,
+            "The sub-th1ng timer could not be resumed after unlocking Windows.");
     }
 
     [RelayCommand]
@@ -782,6 +900,57 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private async Task<bool> StartTimerAsync(
+        Th1ng th1ng,
+        DateTime? startedAtUtc = null,
+        string errorMessage = "The timer could not be started.")
+    {
+        var previousTimerStartedAt = th1ng.TimerStartedAt;
+        th1ng.TimerStartedAt = startedAtUtc ?? DateTime.UtcNow;
+
+        try
+        {
+            await updateTh1ng(th1ng);
+            OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
+            return true;
+        }
+        catch (Exception exception)
+        {
+            th1ng.TimerStartedAt = previousTimerStartedAt;
+            OnPropertyChanged(nameof(ActiveTh1ng));
+            OnPropertyChanged(nameof(MiniDisplayedTh1ng));
+            ReportError(errorMessage, exception);
+            return false;
+        }
+    }
+
+    private async Task<bool> PauseRunningSubTimersAsync(
+        Th1ng parent,
+        DateTime? stoppedAtUtc = null)
+    {
+        foreach (var subTh1ng in parent.SubTh1ngs
+                     .Where(candidate => candidate.IsTimerRunning)
+                     .ToList())
+        {
+            if (!await PauseTimerAsync(
+                    subTh1ng,
+                    stoppedAtUtc))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private IEnumerable<Th1ng> GetSubTh1ngs()
+    {
+        return OpenTh1ngs
+            .Concat(DoneTh1ngs)
+            .SelectMany(parent => parent.SubTh1ngs);
+    }
+
     private async Task<bool> PauseTimerAsync(
         Th1ng th1ng,
         DateTime? stoppedAtUtc = null)
@@ -818,6 +987,12 @@ public partial class MainViewModel : ObservableObject
             if (th1ng.IsTimerRunning)
             {
                 th1ng.RefreshTimerDisplay();
+            }
+
+            foreach (var subTh1ng in th1ng.SubTh1ngs
+                         .Where(candidate => candidate.IsTimerRunning))
+            {
+                subTh1ng.RefreshTimerDisplay();
             }
         }
 

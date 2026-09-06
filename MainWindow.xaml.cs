@@ -3,6 +3,7 @@ using nineth1ngs.Services;
 using nineth1ngs.ViewModels;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -29,6 +30,7 @@ public partial class MainWindow : Window
     private Th1ng? sessionLockedTimerTh1ng;
     private bool sessionTimeReviewOpen;
     private Views.MiniModeWindow? miniModeWindow;
+    private CancellationTokenSource? subTh1ngClickCancellation;
     private const int PreviousTh1ngHotkeyId = 9004;
     private const uint VirtualKeyLeft = 0x25;
 
@@ -470,6 +472,60 @@ public partial class MainWindow : Window
         DragMove();
     }
 
+    private async void SubTh1ngRowPreviewMouseLeftButtonDown(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        if (sender is not Grid
+            {
+                DataContext: Th1ng subTh1ng
+            } ||
+            !subTh1ng.ParentId.HasValue ||
+            IsSubTh1ngTimerBlockedElement(
+                e.OriginalSource as DependencyObject))
+        {
+            return;
+        }
+
+        if (e.ClickCount > 1)
+        {
+            subTh1ngClickCancellation?.Cancel();
+            return;
+        }
+
+        subTh1ngClickCancellation?.Cancel();
+
+        var cancellation = new CancellationTokenSource();
+        subTh1ngClickCancellation = cancellation;
+
+        try
+        {
+            await Task.Delay(
+                TimeSpan.FromMilliseconds(250),
+                cancellation.Token);
+
+            if (!cancellation.IsCancellationRequested &&
+                DataContext is MainViewModel viewModel)
+            {
+                await viewModel.ToggleSubTh1ngTimerAsync(subTh1ng);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+        }
+        finally
+        {
+            if (ReferenceEquals(
+                    subTh1ngClickCancellation,
+                    cancellation))
+            {
+                subTh1ngClickCancellation = null;
+            }
+
+            cancellation.Dispose();
+        }
+    }
+
     private void Th1ngRowMouseLeftButtonUp(
         object sender,
         MouseButtonEventArgs e)
@@ -741,6 +797,22 @@ public partial class MainWindow : Window
                 {
                     return true;
                 }
+            }
+
+            source = VisualTreeHelper.GetParent(source);
+        }
+
+        return false;
+    }
+
+    private static bool IsSubTh1ngTimerBlockedElement(
+        DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is Button or TextBox)
+            {
+                return true;
             }
 
             source = VisualTreeHelper.GetParent(source);
