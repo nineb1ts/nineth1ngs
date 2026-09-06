@@ -503,24 +503,15 @@
         <Style x:Key="SubTh1ngIconButtonStyle"
                BasedOn="{StaticResource CompletionIconButtonStyle}"
                TargetType="Button">
-            <Setter Property="Width"
-                    Value="24"/>
-            <Setter Property="Height"
-                    Value="24"/>
-            <Setter Property="Margin"
-                    Value="0"/>
-            <Setter Property="Padding"
-                    Value="0"/>
-            <Setter Property="Background"
-                    Value="Transparent"/>
-            <Setter Property="BorderThickness"
-                    Value="0"/>
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="Cursor"
-                    Value="Hand"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -531,8 +522,7 @@
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
+                            <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground"
                                         Value="{StaticResource AccentBrush}"/>
                             </Trigger>
@@ -545,24 +535,15 @@
         <Style x:Key="SubTh1ngDangerIconButtonStyle"
                BasedOn="{StaticResource DangerIconButtonStyle}"
                TargetType="Button">
-            <Setter Property="Width"
-                    Value="24"/>
-            <Setter Property="Height"
-                    Value="24"/>
-            <Setter Property="Margin"
-                    Value="0"/>
-            <Setter Property="Padding"
-                    Value="0"/>
-            <Setter Property="Background"
-                    Value="Transparent"/>
-            <Setter Property="BorderThickness"
-                    Value="0"/>
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="Cursor"
-                    Value="Hand"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -573,8 +554,7 @@
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
+                            <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground"
                                         Value="{StaticResource AccentBrush}"/>
                             </Trigger>
@@ -589,18 +569,12 @@
         <Style x:Key="FlatIconButtonStyle"
                BasedOn="{StaticResource CompletionIconButtonStyle}"
                TargetType="Button">
-            <Setter Property="Background"
-                    Value="Transparent"/>
-            <Setter Property="BorderThickness"
-                    Value="0"/>
-            <Setter Property="Padding"
-                    Value="0"/>
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="Cursor"
-                    Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -609,8 +583,7 @@
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
+                            <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground"
                                         Value="{StaticResource AccentBrush}"/>
                             </Trigger>
@@ -623,18 +596,12 @@
         <Style x:Key="FlatDangerIconButtonStyle"
                BasedOn="{StaticResource DangerIconButtonStyle}"
                TargetType="Button">
-            <Setter Property="Background"
-                    Value="Transparent"/>
-            <Setter Property="BorderThickness"
-                    Value="0"/>
-            <Setter Property="Padding"
-                    Value="0"/>
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="Cursor"
-                    Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -643,8 +610,7 @@
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
+                            <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground"
                                         Value="{StaticResource AccentBrush}"/>
                             </Trigger>
@@ -657,16 +623,11 @@
         <Style x:Key="FlatWindowButtonStyle"
                BasedOn="{StaticResource WindowButtonStyle}"
                TargetType="Button">
-            <Setter Property="Background"
-                    Value="Transparent"/>
-            <Setter Property="BorderThickness"
-                    Value="0"/>
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="Cursor"
-                    Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -677,8 +638,7 @@
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
+                            <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground"
                                         Value="{StaticResource AccentBrush}"/>
                             </Trigger>
@@ -701,8 +661,7 @@
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
+                            <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground"
                                         Value="{StaticResource DangerBrush}"/>
                             </Trigger>
@@ -715,16 +674,11 @@
         <Style x:Key="FlatNavigationIconButtonStyle"
                BasedOn="{StaticResource IconButtonStyle}"
                TargetType="Button">
-            <Setter Property="Background"
-                    Value="Transparent"/>
-            <Setter Property="BorderThickness"
-                    Value="0"/>
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center"/>
-            <Setter Property="Cursor"
-                    Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -733,8 +687,7 @@
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
+                            <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground"
                                         Value="{StaticResource AccentBrush}"/>
                             </Trigger>
@@ -2283,46 +2236,47 @@
             <!-- ADD NEW TH1NG                                         -->
             <!-- ===================================================== -->
 
-            <Border Grid.Row="3"
-                    Margin="18,6,18,10"
-                    Padding="10,4,6,4"
-                    Background="{StaticResource SurfaceBrush}"
-                    Style="{StaticResource AddTh1ngAreaVisibilityStyle}"
-                    BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8">
-                <Grid MinHeight="34">
+            <Grid Grid.Row="3"
+                  Margin="18,6,18,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- Placeholder -->
+                <!-- INPUT -->
+                <Border Grid.Column="0"
+                        Padding="10,4"
+                        Background="{StaticResource SurfaceBrush}"
+                        Style="{StaticResource AddTh1ngAreaVisibilityStyle}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                    <Grid MinHeight="34">
 
-                    <TextBlock Text="Add a new th1ng..."
-                               Margin="3,0,0,0"
-                               VerticalAlignment="Center"
-                               FontFamily="Segoe UI Variable Small"
-                               FontSize="15"
-                               Foreground="{StaticResource MutedTextBrush}"
-                               IsHitTestVisible="False">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility"
-                                        Value="Collapsed"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding NewTh1ngText}"
-                                                 Value="">
-                                        <Setter Property="Visibility"
-                                                Value="Visible"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                        <!-- Placeholder -->
+                        <TextBlock Text="Add a new th1ng..."
+                                   Margin="3,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Segoe UI Variable Small"
+                                   FontSize="15"
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding NewTh1ngText}"
+                                                     Value="">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
                         <TextBox x:Name="NewTh1ngTextBox"
-                                 Grid.Column="0"
                                  Text="{Binding NewTh1ngText,
                                                 UpdateSourceTrigger=PropertyChanged}"
                                  VerticalContentAlignment="Center"
@@ -2338,20 +2292,37 @@
                                             Command="{Binding AddTh1ngCommand}"/>
                             </TextBox.InputBindings>
                         </TextBox>
-                        <Button Grid.Column="1"
-                                Command="{Binding AddTh1ngCommand}"
-                                Style="{StaticResource AddButtonStyle}"
-                                ToolTip="Add th1ng">
-                            <Path Data="{StaticResource AddGeometry}"
-                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
-                                                   Path=Foreground}"
-                                  StrokeThickness="1.7"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"/>
-                        </Button>
                     </Grid>
-                </Grid>
-            </Border>
+                </Border>
+
+                <!-- ADD BUTTON -->
+                <Button Grid.Column="1"
+                        Width="42"
+                        Height="42"
+                        Margin="8,0,0,0"
+                        Command="{Binding AddTh1ngCommand}"
+                        ToolTip="Add th1ng">
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource AddButtonStyle}"
+                               TargetType="Button">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedSection}"
+                                             Value="settings">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+
+                    <Path Data="{StaticResource AddGeometry}"
+                          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                           Path=Foreground}"
+                          StrokeThickness="1.7"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round"/>
+                </Button>
+            </Grid>
         </Grid>
     </Border>
 </Window>
