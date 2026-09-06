@@ -232,7 +232,7 @@ public partial class MainWindow : Window
             0,
             (int)(unlockedAtUtc - lockedAtUtc).TotalSeconds);
 
-        if (lockedSeconds < 60)
+        if (lockedSeconds < 2)
         {
             return;
         }
@@ -263,13 +263,29 @@ public partial class MainWindow : Window
                 miniModeWindow.Activate();
             }
 
+            Window dialogOwner = miniModeWindow is not null
+                ? miniModeWindow
+                : this;
+
             var dialog = new Views.SessionTimeReviewWindow(
                 lockedSeconds,
                 availableTh1ngs,
                 previouslyRunningTh1ng.Id)
             {
-                Owner = this
+                Owner = dialogOwner
             };
+
+            if (miniModeWindow is not null)
+            {
+                dialog.WindowStartupLocation = WindowStartupLocation.Manual;
+
+                dialog.Loaded += (_, _) =>
+                {
+                    PositionSessionTimeReviewWindow(
+                        dialog,
+                        miniModeWindow);
+                };
+            }
 
             if (dialog.ShowDialog() == true)
             {
@@ -309,6 +325,76 @@ public partial class MainWindow : Window
         {
             sessionTimeReviewOpen = false;
         }
+    }
+
+    private static void PositionSessionTimeReviewWindow(
+        Window dialog,
+        Window miniWindow)
+    {
+        const double gap = 8;
+        const double screenPadding = 8;
+
+        var dialogWidth = dialog.ActualWidth > 0
+            ? dialog.ActualWidth
+            : dialog.Width;
+
+        var dialogHeight = dialog.ActualHeight > 0
+            ? dialog.ActualHeight
+            : dialog.Height;
+
+        var miniWidth = miniWindow.ActualWidth > 0
+            ? miniWindow.ActualWidth
+            : miniWindow.Width;
+
+        var miniHeight = miniWindow.ActualHeight > 0
+            ? miniWindow.ActualHeight
+            : miniWindow.Height;
+
+        var virtualLeft = SystemParameters.VirtualScreenLeft;
+        var virtualTop = SystemParameters.VirtualScreenTop;
+        var virtualRight =
+            virtualLeft + SystemParameters.VirtualScreenWidth;
+        var virtualBottom =
+            virtualTop + SystemParameters.VirtualScreenHeight;
+
+        var left =
+            miniWindow.Left +
+            ((miniWidth - dialogWidth) / 2);
+
+        var belowTop =
+            miniWindow.Top +
+            miniHeight +
+            gap;
+
+        var aboveTop =
+            miniWindow.Top -
+            dialogHeight -
+            gap;
+
+        var top = belowTop;
+
+        if (belowTop + dialogHeight >
+            virtualBottom - screenPadding)
+        {
+            top = aboveTop;
+        }
+
+        left = Math.Clamp(
+            left,
+            virtualLeft + screenPadding,
+            Math.Max(
+                virtualLeft + screenPadding,
+                virtualRight - dialogWidth - screenPadding));
+
+        top = Math.Clamp(
+            top,
+            virtualTop + screenPadding,
+            Math.Max(
+                virtualTop + screenPadding,
+                virtualBottom - dialogHeight - screenPadding));
+
+        dialog.Left = left;
+        dialog.Top = top;
     }
 
     private void FocusNewTh1ngInput()
