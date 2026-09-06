@@ -593,7 +593,7 @@
                             Orientation="Horizontal"
                             VerticalAlignment="Center">
                     <TextBlock Text="{Binding ElapsedTimeText}"
-                               MinWidth="60"
+                               MinWidth="42"
                                Margin="8,0,6,0"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Right"
@@ -673,13 +673,16 @@
                         </StackPanel.Style>
 
                         <Button Style="{StaticResource CompletionIconButtonStyle}"
+                                Width="22"
+                                Height="22"
+                                Margin="0"
                                 Command="{Binding DataContext.ToggleCompletionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 ToolTip="Complete or reopen sub-th1ng">
-                            <Grid Width="15"
-                                  Height="15">
-                                <Viewbox Width="15"
-                                         Height="15"
+                            <Grid Width="13"
+                                  Height="13">
+                                <Viewbox Width="13"
+                                         Height="13"
                                          Margin="-2,-2,0,0"
                                          Stretch="Uniform">
                                     <Viewbox.Style>
@@ -702,8 +705,8 @@
                                           StrokeLineJoin="Round"/>
                                 </Viewbox>
 
-                                <Viewbox Width="15"
-                                         Height="15"
+                                <Viewbox Width="13"
+                                         Height="13"
                                          Stretch="Uniform">
                                     <Viewbox.Style>
                                         <Style TargetType="Viewbox">
@@ -730,11 +733,14 @@
                         </Button>
 
                         <Button Style="{StaticResource CompletionIconButtonStyle}"
+                                Width="22"
+                                Height="22"
+                                Margin="0"
                                 Command="{Binding DataContext.CopyTh1ngTextCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 ToolTip="Copy sub-th1ng text">
-                            <Viewbox Width="15"
-                                     Height="15"
+                            <Viewbox Width="13"
+                                     Height="13"
                                      Stretch="Uniform">
                                 <Path Data="{StaticResource FeatherCopyGeometry}"
                                       Fill="Transparent"
@@ -747,13 +753,20 @@
                         </Button>
 
                         <Button Style="{StaticResource DangerIconButtonStyle}"
+                                Width="22"
+                                Height="22"
+                                Margin="0"
                                 Command="{Binding DataContext.DeleteSubTh1ngCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 ToolTip="Delete sub-th1ng">
-                            <Viewbox Width="15"
-                                     Height="15"
-                                     Margin="-2,-2,0,0"
+                            <Viewbox Width="13"
+                                     Height="13"
                                      Stretch="Uniform">
+                                <Viewbox.RenderTransform>
+                                    <TranslateTransform X="-1"
+                                                        Y="-1"/>
+                                </Viewbox.RenderTransform>
+
                                 <Path Data="{StaticResource FeatherXGeometry}"
                                       Fill="Transparent"
                                       Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
