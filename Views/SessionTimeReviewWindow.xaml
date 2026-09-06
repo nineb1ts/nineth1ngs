@@ -212,8 +212,10 @@
                        FontWeight="SemiBold"
                        Foreground="{StaticResource SecondaryTextBrush}"/>
 
-            <ListBox ItemsSource="{Binding AvailableTh1ngs}"
+            <ListBox x:Name="Th1ngList"
+                     ItemsSource="{Binding AvailableTh1ngs}"
                      SelectedItem="{Binding SelectedTh1ng}"
+                     SelectionChanged="Th1ngListSelectionChanged"
                      ItemContainerStyle="{StaticResource SessionTh1ngItemStyle}"
                      Background="Transparent"
                      BorderThickness="0"
@@ -225,6 +227,75 @@
                            BasedOn="{StaticResource DialogVerticalScrollBarStyle}"/>
                 </ListBox.Resources>
             </ListBox>
+
+            <TextBlock Margin="0,14,0,8"
+                       Text="OR CREATE NEW TH1NG"
+                       FontFamily="Segoe UI Variable Small"
+                       FontSize="10"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource SecondaryTextBrush}"/>
+
+            <Border Padding="10,4"
+                    Background="{StaticResource SurfaceHighlightBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderBrush"
+                                Value="{StaticResource BorderBrush}"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin"
+                                     Value="True">
+                                <Setter Property="BorderBrush"
+                                        Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <Grid MinHeight="34">
+                    <TextBlock Text="Create a new th1ng..."
+                               Margin="2,0,0,0"
+                               VerticalAlignment="Center"
+                               FontFamily="Segoe UI Variable Small"
+                               FontSize="14"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility"
+                                        Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding NewTh1ngText}"
+                                                 Value="">
+                                        <Setter Property="Visibility"
+                                                Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding NewTh1ngText}"
+                                                 Value="{x:Null}">
+                                        <Setter Property="Visibility"
+                                                Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <TextBox x:Name="NewTh1ngTextBox"
+                             Text="{Binding NewTh1ngText, UpdateSourceTrigger=PropertyChanged}"
+                             TextChanged="NewTh1ngTextBoxTextChanged"
+                             KeyDown="NewTh1ngTextBoxKeyDown"
+                             VerticalContentAlignment="Center"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Padding="2,0"
+                             Foreground="{StaticResource PrimaryTextBrush}"
+                             FontFamily="Segoe UI Variable Small"
+                             FontSize="14"
+                             CaretBrush="{StaticResource AccentBrush}"/>
+                </Grid>
+            </Border>
 
             <StackPanel Margin="0,18,0,0"
                         Orientation="Horizontal"

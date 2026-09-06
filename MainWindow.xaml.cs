@@ -1,9 +1,7 @@
 using nineth1ngs.Models;
 using nineth1ngs.Services;
 using nineth1ngs.ViewModels;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -244,11 +242,6 @@ public partial class MainWindow : Window
                 !th1ng.IsCompleted)
             .ToList();
 
-        if (availableTh1ngs.Count == 0)
-        {
-            return;
-        }
-
         sessionTimeReviewOpen = true;
 
         try
@@ -277,12 +270,22 @@ public partial class MainWindow : Window
                 Owner = this
             };
 
-            if (dialog.ShowDialog() == true &&
-                dialog.SelectedTh1ng is not null)
+            if (dialog.ShowDialog() == true)
             {
-                await viewModel.AddElapsedTimeAsync(
-                    dialog.SelectedTh1ng,
-                    lockedSeconds);
+                Th1ng? targetTh1ng = dialog.SelectedTh1ng;
+
+                if (!string.IsNullOrWhiteSpace(dialog.NewTh1ngText))
+                {
+                    targetTh1ng = await viewModel.AddTopLevelTh1ngAsync(
+                        dialog.NewTh1ngText);
+                }
+
+                if (targetTh1ng is not null)
+                {
+                    await viewModel.AddElapsedTimeAsync(
+                        targetTh1ng,
+                        lockedSeconds);
+                }
             }
         }
         finally

@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using nineth1ngs.Models;
 
 namespace nineth1ngs.Views;
@@ -6,6 +8,7 @@ namespace nineth1ngs.Views;
 public partial class SessionTimeReviewWindow : Window
 {
     private readonly SessionTimeReviewViewModel viewModel;
+    private bool isUpdatingSelection;
 
     public SessionTimeReviewWindow(
         int awaySeconds,
@@ -25,6 +28,9 @@ public partial class SessionTimeReviewWindow : Window
     public Th1ng? SelectedTh1ng =>
         viewModel.SelectedTh1ng;
 
+    public string NewTh1ngText =>
+        viewModel.NewTh1ngText.Trim();
+
     private void DiscardClick(
         object sender,
         RoutedEventArgs e)
@@ -36,11 +42,72 @@ public partial class SessionTimeReviewWindow : Window
         object sender,
         RoutedEventArgs e)
     {
-        if (viewModel.SelectedTh1ng is null)
+        if (viewModel.SelectedTh1ng is null &&
+            string.IsNullOrWhiteSpace(viewModel.NewTh1ngText))
         {
             return;
         }
 
+        DialogResult = true;
+    }
+
+    private void NewTh1ngTextBoxTextChanged(
+        object sender,
+        TextChangedEventArgs e)
+    {
+        if (isUpdatingSelection ||
+            string.IsNullOrWhiteSpace(viewModel.NewTh1ngText))
+        {
+            return;
+        }
+
+        isUpdatingSelection = true;
+
+        try
+        {
+            viewModel.SelectedTh1ng = null;
+            Th1ngList.SelectedItem = null;
+        }
+        finally
+        {
+            isUpdatingSelection = false;
+        }
+    }
+
+    private void Th1ngListSelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (isUpdatingSelection ||
+            Th1ngList.SelectedItem is null)
+        {
+            return;
+        }
+
+        isUpdatingSelection = true;
+
+        try
+        {
+            viewModel.NewTh1ngText = string.Empty;
+            NewTh1ngTextBox.Clear();
+        }
+        finally
+        {
+            isUpdatingSelection = false;
+        }
+    }
+
+    private void NewTh1ngTextBoxKeyDown(
+        object sender,
+        KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter ||
+            string.IsNullOrWhiteSpace(viewModel.NewTh1ngText))
+        {
+            return;
+        }
+
+        e.Handled = true;
         DialogResult = true;
     }
 
@@ -65,6 +132,8 @@ public partial class SessionTimeReviewWindow : Window
         public IReadOnlyList<Th1ng> AvailableTh1ngs { get; }
 
         public Th1ng? SelectedTh1ng { get; set; }
+
+        public string NewTh1ngText { get; set; } = string.Empty;
 
         public string AwayTimeText { get; }
 
