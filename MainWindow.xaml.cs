@@ -238,13 +238,21 @@ public partial class MainWindow : Window
 
         try
         {
-            if (WindowState == WindowState.Minimized)
+            if (miniModeWindow is null)
             {
-                WindowState = WindowState.Normal;
-            }
+                if (WindowState == WindowState.Minimized)
+                {
+                    WindowState = WindowState.Normal;
+                }
 
-            Show();
-            Activate();
+                Show();
+                Activate();
+            }
+            else
+            {
+                miniModeWindow.Show();
+                miniModeWindow.Activate();
+            }
 
             var dialog = new Views.SessionTimeReviewWindow(
                 lockedSeconds,
@@ -331,10 +339,20 @@ public partial class MainWindow : Window
         }
 
         SaveMiniWindowPosition(miniWindow);
-        miniModeWindow = null;
-        miniWindow.Close();
+
         Show();
+
+        if (WindowState == WindowState.Minimized)
+        {
+            WindowState = WindowState.Normal;
+        }
+
         Activate();
+
+        miniWindow.Closed -= MiniModeWindowClosed;
+        miniWindow.Close();
+
+        miniModeWindow = null;
     }
 
     private void MiniModeWindowClosed(
