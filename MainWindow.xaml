@@ -101,6 +101,10 @@
                                RadiusY="1"/>
         </GeometryGroup>
 
+        <GeometryGroup x:Key="FeatherWindowMinimizeGeometry">
+            <PathGeometry Figures="M5,12 L19,12"/>
+        </GeometryGroup>
+
         <GeometryGroup x:Key="FeatherMinimizeGeometry">
             <PathGeometry Figures="
                 M3,8 L8,8 L8,3
@@ -1270,10 +1274,17 @@
                     <Button Click="MinimizeClick"
                             Style="{StaticResource WindowButtonStyle}"
                             ToolTip="Minimize">
-                        <svgc:SvgViewbox Source="/nineth1ngs;component/Assets/Icons/minimize.svg"
-                                         Width="15"
-                                         Height="15"
-                                         Stretch="Uniform"/>
+                        <Viewbox Width="15"
+                                 Height="15"
+                                 Margin="-1,0,0,0"
+                                 Stretch="Uniform">
+                            <Path Data="{StaticResource FeatherWindowMinimizeGeometry}"
+                                  Fill="Transparent"
+                                  Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"
+                                  StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"/>
+                        </Viewbox>
                     </Button>
 
                     <Button Click="MiniModeClick"
@@ -1281,6 +1292,7 @@
                             ToolTip="Mini mode">
                         <Viewbox Width="15"
                                  Height="15"
+                                 Margin="0,2,0,0"
                                  Stretch="Uniform">
                             <Path Data="{StaticResource FeatherMinimizeGeometry}"
                                   Fill="Transparent"

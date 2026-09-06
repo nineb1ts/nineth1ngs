@@ -26,6 +26,7 @@
     </shell:WindowChrome.WindowChrome>
 
     <Window.Resources>
+
         <Style x:Key="MiniTimerButtonStyle"
                BasedOn="{StaticResource AddButtonStyle}"
                TargetType="Button">
@@ -75,6 +76,7 @@
         <GeometryGroup x:Key="FeatherPlayGeometry">
             <PathGeometry Figures="M5,3 L19,12 L5,21 Z"/>
         </GeometryGroup>
+
         <GeometryGroup x:Key="FeatherPauseGeometry">
             <RectangleGeometry Rect="6,4,4,16"
                                RadiusX="1"
@@ -83,9 +85,14 @@
                                RadiusX="1"
                                RadiusY="1"/>
         </GeometryGroup>
-        <GeometryGroup x:Key="FeatherXGeometry">
-            <PathGeometry Figures="M18,6 L6,18 M6,6 L18,18"/>
+
+        <GeometryGroup x:Key="FeatherMaximizeGeometry">
+            <PathGeometry Figures="M8,3 L3,3 L3,8"/>
+            <PathGeometry Figures="M16,3 L21,3 L21,8"/>
+            <PathGeometry Figures="M8,21 L3,21 L3,16"/>
+            <PathGeometry Figures="M16,21 L21,21 L21,16"/>
         </GeometryGroup>
+
         <GeometryGroup x:Key="FeatherGripGeometry">
             <EllipseGeometry Center="8,7"
                              RadiusX="1.2"
@@ -113,17 +120,19 @@
                              RadiusY="1.2"/>
         </GeometryGroup>
     </Window.Resources>
-
     <Border Background="{StaticResource WindowBackgroundBrush}"
             BorderBrush="{StaticResource BorderBrush}"
             BorderThickness="1"
             CornerRadius="10">
         <Grid>
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="42"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="64"/>
             </Grid.ColumnDefinitions>
+
+            <!-- LEFT RAIL -->
 
             <Border x:Name="RailHoverZone"
                     Grid.Column="0"
@@ -140,60 +149,48 @@
                     </Grid.RenderTransform>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="28"/>
-                        <RowDefinition Height="28"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
+
+                    <!-- RETURN TO NORMAL MODE -->
 
                     <Button Grid.Row="0"
                             Width="26"
                             Height="26"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
-                            Click="CloseApplicationClick"
-                            ToolTip="Close nineth1ngs"
+                            Margin="0,4,0,0"
+                            Click="ReturnToNormalClick"
+                            ToolTip="Return to normal mode"
                             Background="Transparent"
                             BorderThickness="0"
                             Padding="0"
                             Focusable="False"
                             Cursor="Hand">
-
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Grid Background="Transparent">
-                                    <ContentPresenter
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Margin="-3,0,0,0"/>
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
                                 </Grid>
                             </ControlTemplate>
                         </Button.Template>
 
-                        <Viewbox Width="14"
-                                 Height="14">
-                            <Path Data="{StaticResource FeatherXGeometry}"
+                        <Viewbox Width="16"
+                                 Height="16">
+                            <Path Data="{StaticResource FeatherMaximizeGeometry}"
                                   Stroke="{StaticResource AccentBrush}"
                                   StrokeThickness="1.8"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round"/>
+                                  StrokeLineJoin="Round"
+                                  Fill="Transparent"/>
                         </Viewbox>
                     </Button>
 
-                    <Button Grid.Row="1"
-                            Width="26"
-                            Height="26"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Click="ReturnToNormalClick"
-                            Style="{StaticResource IconButtonStyle}"
-                            ToolTip="Return to normal mode">
-                        <svgc:SvgViewbox Source="/nineth1ngs;component/Assets/Icons/maximize.svg"
-                                         Width="15"
-                                         Height="15"
-                                         Stretch="Uniform"/>
-                    </Button>
+                    <!-- DRAG HANDLE -->
 
-                    <Viewbox Grid.Row="2"
+                    <Viewbox Grid.Row="1"
                              Width="18"
                              Height="24"
                              HorizontalAlignment="Center"
@@ -204,6 +201,8 @@
                     </Viewbox>
                 </Grid>
             </Border>
+
+            <!-- TH1NG + TIMER -->
 
             <Grid Grid.Column="1"
                   Margin="4,11,6,10"
@@ -228,17 +227,23 @@
                            Foreground="{StaticResource AccentBrush}"/>
             </Grid>
 
+            <!-- PLAY / PAUSE -->
+
             <Button Grid.Column="2"
                     Width="38"
                     Height="38"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+                    Margin="-8,0,6,0"
                     Command="{Binding ToggleTimerCommand}"
                     CommandParameter="{Binding MiniDisplayedTh1ng}"
                     Style="{StaticResource MiniTimerButtonStyle}"
                     ToolTip="Start or pause timer">
                 <Grid Width="16"
                       Height="18">
+
+                    <!-- PLAY -->
+
                     <Viewbox Stretch="Uniform">
                         <Viewbox.Style>
                             <Style TargetType="Viewbox">
@@ -259,7 +264,11 @@
                               StrokeEndLineCap="Round"
                               StrokeLineJoin="Round"/>
                     </Viewbox>
-                    <Viewbox Stretch="Uniform">
+
+                    <!-- PAUSE -->
+
+                    <Viewbox Stretch="Uniform"
+                             Margin="-3,0,0,0">
                         <Viewbox.Style>
                             <Style TargetType="Viewbox">
                                 <Setter Property="Visibility"
@@ -282,7 +291,6 @@
                     </Viewbox>
                 </Grid>
             </Button>
-
         </Grid>
     </Border>
 </Window>
