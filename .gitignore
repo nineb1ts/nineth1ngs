@@ -34,3 +34,6 @@
 
 # Local planning files
 .user/
+
+# Release artifacts
+nineth1ngs-v*-win-x64.zip
