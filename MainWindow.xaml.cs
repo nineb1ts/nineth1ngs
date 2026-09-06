@@ -29,6 +29,8 @@ public partial class MainWindow : Window
     private Th1ng? sessionLockedTimerTh1ng;
     private bool sessionTimeReviewOpen;
     private Views.MiniModeWindow? miniModeWindow;
+    private const int PreviousTh1ngHotkeyId = 9004;
+    private const uint VirtualKeyLeft = 0x25;
 
     public MainWindow(
         Th1ngStore store,
@@ -91,6 +93,10 @@ public partial class MainWindow : Window
             SelectTh1ngHotkeyId,
             VirtualKeyRight,
             "Ctrl + Alt + Right");
+        RegisterGlobalHotkey(
+            PreviousTh1ngHotkeyId,
+            VirtualKeyLeft,
+            "Ctrl + Alt + Left");
         RegisterGlobalHotkey(
             ToggleTimerHotkeyId,
             VirtualKeySpace,
@@ -886,6 +892,9 @@ public partial class MainWindow : Window
                         break;
                     case SelectTh1ngHotkeyId:
                         viewModel.SelectNextMiniTh1ng();
+                        break;
+                    case PreviousTh1ngHotkeyId:
+                        viewModel.SelectPreviousMiniTh1ng();
                         break;
                     case ToggleTimerHotkeyId:
                         _ = viewModel.ToggleSelectedMiniTimerAsync();

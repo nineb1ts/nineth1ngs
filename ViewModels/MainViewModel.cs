@@ -902,6 +902,11 @@ public partial class MainViewModel : ObservableObject
         SaveOpenOrder();
     }
 
+    public void SelectPreviousMiniTh1ng()
+    {
+        SelectAdjacentMiniTh1ng(-1);
+    }
+
     private void ApplySavedOpenOrder()
     {
         var savedOrder = th1ngOrderService.Load();
