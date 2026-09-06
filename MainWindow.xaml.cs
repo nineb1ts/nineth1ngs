@@ -29,7 +29,6 @@ public partial class MainWindow : Window
     private Th1ng? sessionLockedTimerTh1ng;
     private bool sessionTimeReviewOpen;
     private Views.MiniModeWindow? miniModeWindow;
-    private Views.QuickInputWindow? quickInputWindow;
 
     public MainWindow(
         Th1ngStore store,
@@ -158,9 +157,6 @@ public partial class MainWindow : Window
     {
         try
         {
-            quickInputWindow?.Close();
-            quickInputWindow = null;
-
             await ((MainViewModel)DataContext).PauseRunningTimersAsync();
 
             SaveWindowSettings();
@@ -300,8 +296,8 @@ public partial class MainWindow : Window
     }
 
     private void MiniModeClick(
-        object sender,
-        RoutedEventArgs e)
+    object sender,
+    RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel viewModel ||
             miniModeWindow is not null)
@@ -312,20 +308,28 @@ public partial class MainWindow : Window
         var miniWindow = new Views.MiniModeWindow(
             viewModel,
             ReturnToNormalMode,
-            Close);
+            CreateQuickInputAsync);
 
         miniModeWindow = miniWindow;
         miniWindow.Closed += MiniModeWindowClosed;
-        var initialMiniPosition = WindowSettingsService.IsValidMiniPosition(windowSettings)
-            ? new System.Windows.Point(windowSettings.MiniLeft!.Value, windowSettings.MiniTop!.Value)
-            : new System.Windows.Point(Left + 16, Top + 16);
+
+        var initialMiniPosition =
+            WindowSettingsService.IsValidMiniPosition(windowSettings)
+                ? new System.Windows.Point(
+                    windowSettings.MiniLeft!.Value,
+                    windowSettings.MiniTop!.Value)
+                : new System.Windows.Point(
+                    Left + 16,
+                    Top + 16);
 
         miniWindow.Left = initialMiniPosition.X;
         miniWindow.Top = initialMiniPosition.Y;
+
         miniWindow.Show();
         miniWindow.KeepOnWorkingArea();
 
         Hide();
+
         miniWindow.Activate();
     }
 
@@ -434,18 +438,7 @@ public partial class MainWindow : Window
 
     private void ShowMiniQuickInput()
     {
-        if (miniModeWindow is null || quickInputWindow is not null)
-        {
-            return;
-        }
-
-        var inputWindow = miniModeWindow.CreateQuickInput(
-            CreateQuickInputAsync);
-
-        quickInputWindow = inputWindow;
-        inputWindow.Closed += (_, _) => quickInputWindow = null;
-        inputWindow.Show();
-        inputWindow.Activate();
+        miniModeWindow?.ShowQuickInput();
     }
 
     private void TitleBarMouseLeftButtonDown(

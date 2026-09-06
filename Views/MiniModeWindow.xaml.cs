@@ -12,20 +12,23 @@ namespace nineth1ngs.Views;
 public partial class MiniModeWindow : Window
 {
     private readonly Action returnToNormal;
-    private readonly Action closeApplication;
+    private readonly Func<string, Task> submitQuickInput;
 
     public MiniModeWindow(
-        MainViewModel viewModel,
-        Action returnToNormal,
-        Action closeApplication)
+    MainViewModel viewModel,
+    Action returnToNormal,
+    Func<string, Task> submitQuickInput)
     {
         InitializeComponent();
 
         DataContext = viewModel;
+
         this.returnToNormal = returnToNormal;
-        this.closeApplication = closeApplication;
+        this.submitQuickInput = submitQuickInput;
+
         viewModel.SelectMiniTh1ng(
-            viewModel.MiniDisplayedTh1ng ?? viewModel.OpenTh1ngs.FirstOrDefault());
+            viewModel.MiniDisplayedTh1ng ??
+            viewModel.OpenTh1ngs.FirstOrDefault());
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -53,11 +56,69 @@ public partial class MiniModeWindow : Window
         returnToNormal();
     }
 
-    private void CloseApplicationClick(
+    public void ShowQuickInput()
+    {
+        QuickInputArea.Visibility = Visibility.Visible;
+
+        Height = 136;
+
+        Activate();
+
+        Dispatcher.BeginInvoke(() =>
+        {
+            QuickInputTextBox.Focus();
+            Keyboard.Focus(QuickInputTextBox);
+
+            QuickInputTextBox.SelectAll();
+        });
+    }
+
+    private void HideQuickInput()
+    {
+        QuickInputArea.Visibility = Visibility.Collapsed;
+
+        Height = 86;
+
+        QuickInputTextBox.Clear();
+    }
+
+    private async Task SubmitQuickInputAsync()
+    {
+        var text = QuickInputTextBox.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return;
+        }
+
+        await submitQuickInput(text);
+
+        HideQuickInput();
+    }
+
+    private async void QuickInputTextBoxKeyDown(
+        object sender,
+        KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            e.Handled = true;
+
+            await SubmitQuickInputAsync();
+        }
+        else if (e.Key == Key.Escape)
+        {
+            e.Handled = true;
+
+            HideQuickInput();
+        }
+    }
+
+    private async void QuickInputSubmitClick(
         object sender,
         RoutedEventArgs e)
     {
-        closeApplication();
+        await SubmitQuickInputAsync();
     }
 
     private void RailHoverZoneMouseEnter(
