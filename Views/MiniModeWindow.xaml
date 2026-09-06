@@ -72,11 +72,11 @@
             </Style.Triggers>
         </Style>
 
-        <GeometryGroup x:Key="FeatherPlayGeometry">
-            <PathGeometry Figures="M5,3 L19,12 L5,21 Z"/>
-        </GeometryGroup>
+        <!-- Filled timer icons -->
+        <PathGeometry x:Key="FilledPlayGeometry"
+                      Figures="M6,4 L20,12 L6,20 Z"/>
 
-        <GeometryGroup x:Key="FeatherPauseGeometry">
+        <GeometryGroup x:Key="FilledPauseGeometry">
             <RectangleGeometry Rect="6,4,4,16"
                                RadiusX="1"
                                RadiusY="1"/>
@@ -261,7 +261,7 @@
                         <!-- PLAY -->
 
                         <Viewbox Stretch="Uniform"
-                                 Margin="1,0,0,0">
+                                 Margin="-2,-2,0,0">
 
                             <Viewbox.Style>
                                 <Style TargetType="Viewbox">
@@ -275,19 +275,15 @@
                                 </Style>
                             </Viewbox.Style>
 
-                            <Path Data="{StaticResource FeatherPlayGeometry}"
-                                  Fill="Transparent"
-                                  Stroke="{StaticResource WindowBackgroundBrush}"
-                                  StrokeThickness="1.8"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"
-                                  StrokeLineJoin="Round"/>
+                            <Path Data="{StaticResource FilledPlayGeometry}"
+                                  Fill="{StaticResource WindowBackgroundBrush}"
+                                  StrokeThickness="0"/>
                         </Viewbox>
 
                         <!-- PAUSE -->
 
                         <Viewbox Stretch="Uniform"
-                                 Margin="-3,0,0,0">
+                                 Margin="-5,-2,0,0">
 
                             <Viewbox.Style>
                                 <Style TargetType="Viewbox">
@@ -304,12 +300,9 @@
                                 </Style>
                             </Viewbox.Style>
 
-                            <Path Data="{StaticResource FeatherPauseGeometry}"
-                                  Fill="Transparent"
-                                  Stroke="{StaticResource WindowBackgroundBrush}"
-                                  StrokeThickness="1.8"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"/>
+                            <Path Data="{StaticResource FilledPauseGeometry}"
+                                  Fill="{StaticResource WindowBackgroundBrush}"
+                                  StrokeThickness="0"/>
                         </Viewbox>
                     </Grid>
                 </Button>
