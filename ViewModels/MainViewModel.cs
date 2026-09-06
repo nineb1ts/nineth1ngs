@@ -22,6 +22,9 @@ public partial class MainViewModel : ObservableObject
     private string previousSection = "th1ngs";
     private Th1ng? miniSelectedTh1ng;
     private Th1ng? sessionLockedSubTh1ng;
+
+    public Th1ng? SessionLockedSubTh1ng => sessionLockedSubTh1ng;
+
     public string RoundUpThresholdHint => $"Choose a value from 1 to {BillingIntervalMinutes - 1} minutes.";
 
     public IReadOnlyList<int> RoundUpThresholds =>
@@ -719,6 +722,63 @@ public partial class MainViewModel : ObservableObject
 
             ReportError(
                 "The session time could not be added.",
+                exception);
+
+            return false;
+        }
+    }
+
+
+    public async Task<bool> AddElapsedTimeToParentAndSubTh1ngAsync(
+        Th1ng parent,
+        Th1ng subTh1ng,
+        int elapsedSeconds)
+    {
+        if (elapsedSeconds <= 0 ||
+            parent.ParentId.HasValue ||
+            parent.IsCompleted ||
+            !subTh1ng.ParentId.HasValue ||
+            subTh1ng.ParentId.Value != parent.Id ||
+            subTh1ng.IsCompleted)
+        {
+            return false;
+        }
+
+        var previousParentElapsedSeconds = parent.ElapsedSeconds;
+        var previousSubTh1ngElapsedSeconds = subTh1ng.ElapsedSeconds;
+
+        parent.ElapsedSeconds += elapsedSeconds;
+        subTh1ng.ElapsedSeconds += elapsedSeconds;
+
+        parent.RefreshTimerDisplay();
+        subTh1ng.RefreshTimerDisplay();
+
+        try
+        {
+            await updateTh1ng(parent);
+            await updateTh1ng(subTh1ng);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            parent.ElapsedSeconds = previousParentElapsedSeconds;
+            subTh1ng.ElapsedSeconds = previousSubTh1ngElapsedSeconds;
+
+            parent.RefreshTimerDisplay();
+            subTh1ng.RefreshTimerDisplay();
+
+            try
+            {
+                await updateTh1ng(parent);
+                await updateTh1ng(subTh1ng);
+            }
+            catch
+            {
+                // The original error is reported below.
+            }
+
+            ReportError(
+                "The session time could not be added to the th1ng and sub-th1ng.",
                 exception);
 
             return false;

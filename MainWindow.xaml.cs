@@ -218,6 +218,7 @@ public partial class MainWindow : Window
 
         var lockedAtUtc = sessionLockedAtUtc.Value;
         var previouslyRunningTh1ng = sessionLockedTimerTh1ng;
+        var previouslyRunningSubTh1ng = viewModel.SessionLockedSubTh1ng;
         var unlockedAtUtc = DateTime.UtcNow;
 
         sessionLockedAtUtc = null;
@@ -280,7 +281,23 @@ public partial class MainWindow : Window
                         dialog.NewTh1ngText);
                 }
 
-                if (targetTh1ng is not null)
+                if (targetTh1ng is null)
+                {
+                    return;
+                }
+
+                var shouldAlsoAddToSubTh1ng =
+                    previouslyRunningSubTh1ng is not null &&
+                    previouslyRunningSubTh1ng.ParentId == targetTh1ng.Id;
+
+                if (shouldAlsoAddToSubTh1ng)
+                {
+                    await viewModel.AddElapsedTimeToParentAndSubTh1ngAsync(
+                        targetTh1ng,
+                        previouslyRunningSubTh1ng!,
+                        lockedSeconds);
+                }
+                else
                 {
                     await viewModel.AddElapsedTimeAsync(
                         targetTh1ng,
