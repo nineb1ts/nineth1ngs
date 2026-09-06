@@ -25,7 +25,6 @@
     </shell:WindowChrome.WindowChrome>
 
     <Window.Resources>
-
         <Style x:Key="MiniTimerButtonStyle"
                BasedOn="{StaticResource AddButtonStyle}"
                TargetType="Button">
@@ -40,7 +39,6 @@
                             <ContentPresenter HorizontalAlignment="Center"
                                               VerticalAlignment="Center"/>
                         </Border>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver"
                                      Value="True">
@@ -48,14 +46,12 @@
                                         Property="Background"
                                         Value="{StaticResource AccentHoverBrush}"/>
                             </Trigger>
-
                             <Trigger Property="IsPressed"
                                      Value="True">
                                 <Setter TargetName="TimerButtonBorder"
                                         Property="Background"
                                         Value="{StaticResource AccentBrush}"/>
                             </Trigger>
-
                             <Trigger Property="IsEnabled"
                                      Value="False">
                                 <Setter TargetName="TimerButtonBorder"
@@ -103,21 +99,18 @@
             <EllipseGeometry Center="16,7"
                              RadiusX="1.2"
                              RadiusY="1.2"/>
-
             <EllipseGeometry Center="8,12"
                              RadiusX="1.2"
                              RadiusY="1.2"/>
             <EllipseGeometry Center="16,12"
                              RadiusX="1.2"
                              RadiusY="1.2"/>
-
             <EllipseGeometry Center="8,17"
                              RadiusX="1.2"
                              RadiusY="1.2"/>
             <EllipseGeometry Center="16,17"
                              RadiusX="1.2"
                              RadiusY="1.2"/>
-
             <EllipseGeometry Center="8,22"
                              RadiusX="1.2"
                              RadiusY="1.2"/>
@@ -125,7 +118,6 @@
                              RadiusX="1.2"
                              RadiusY="1.2"/>
         </GeometryGroup>
-
     </Window.Resources>
 
     <Border Background="{StaticResource WindowBackgroundBrush}"
@@ -134,18 +126,14 @@
             CornerRadius="10">
 
         <Grid>
-
             <Grid.RowDefinitions>
                 <RowDefinition Height="86"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- ===================================================== -->
-            <!-- MINI MODE                                             -->
-            <!-- ===================================================== -->
+            <!-- MINI MODE -->
 
             <Grid Grid.Row="0">
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="42"/>
                     <ColumnDefinition Width="*"/>
@@ -210,7 +198,6 @@
                                       StrokeLineJoin="Round"
                                       Fill="Transparent"/>
                             </Viewbox>
-
                         </Button>
 
                         <!-- DRAG HANDLE -->
@@ -224,11 +211,8 @@
 
                             <Path Data="{StaticResource FeatherGripGeometry}"
                                   Fill="{StaticResource AccentBrush}"/>
-
                         </Viewbox>
-
                     </Grid>
-
                 </Border>
 
                 <!-- TH1NG + TIMER -->
@@ -257,7 +241,6 @@
                                FontSize="23"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource AccentBrush}"/>
-
                 </Grid>
 
                 <!-- PLAY / PAUSE -->
@@ -282,7 +265,6 @@
 
                             <Viewbox.Style>
                                 <Style TargetType="Viewbox">
-
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding MiniDisplayedTh1ng.IsTimerRunning}"
                                                      Value="True">
@@ -290,7 +272,6 @@
                                                     Value="Collapsed"/>
                                         </DataTrigger>
                                     </Style.Triggers>
-
                                 </Style>
                             </Viewbox.Style>
 
@@ -301,7 +282,6 @@
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"/>
-
                         </Viewbox>
 
                         <!-- PAUSE -->
@@ -311,7 +291,6 @@
 
                             <Viewbox.Style>
                                 <Style TargetType="Viewbox">
-
                                     <Setter Property="Visibility"
                                             Value="Collapsed"/>
 
@@ -322,7 +301,6 @@
                                                     Value="Visible"/>
                                         </DataTrigger>
                                     </Style.Triggers>
-
                                 </Style>
                             </Viewbox.Style>
 
@@ -332,105 +310,86 @@
                                   StrokeThickness="1.8"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"/>
-
                         </Viewbox>
-
                     </Grid>
-
                 </Button>
-
             </Grid>
 
-            <!-- ===================================================== -->
-            <!-- QUICK INPUT                                           -->
-            <!-- ===================================================== -->
+            <!-- QUICK INPUT -->
 
-            <Border x:Name="QuickInputArea"
-                    Grid.Row="1"
-                    Height="50"
-                    Margin="8,0,8,7"
-                    Padding="5"
-                    Background="{StaticResource SurfaceBrush}"
-                    BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Visibility="Collapsed">
+            <Grid x:Name="QuickInputArea"
+                  Grid.Row="1"
+                  Height="46"
+                  Margin="46,0,14,2"
+                  Visibility="Collapsed">
 
-                <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="34"/>
+                </Grid.ColumnDefinitions>
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="40"/>
-                    </Grid.ColumnDefinitions>
+                <!-- INPUT -->
 
-                    <!-- INPUT -->
+                <Border Grid.Column="0"
+                        Margin="0,2,8,6"
+                        Padding="0,0,0,3"
+                        Background="Transparent"
+                        BorderThickness="0,0,0,1">
 
-                    <Border Grid.Column="0"
-                            Margin="0"
-                            Background="{StaticResource WindowBackgroundBrush}"
-                            BorderBrush="{StaticResource AccentBrush}"
-                            BorderThickness="1"
-                            CornerRadius="7">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="BorderBrush"
+                                    Value="{StaticResource BorderBrush}"/>
+
+                            <Style.Triggers>
+                                <Trigger Property="IsKeyboardFocusWithin"
+                                         Value="True">
+                                    <Setter Property="BorderBrush"
+                                            Value="{StaticResource AccentBrush}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <Grid>
+                        <TextBlock Text="Add a th1ng..."
+                                   Margin="0,0,0,1"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Segoe UI Variable Small"
+                                   FontSize="15"
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   IsHitTestVisible="False">
+
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=QuickInputTextBox}"
+                                                     Value="">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
 
                         <TextBox x:Name="QuickInputTextBox"
-                                 Margin="10,0,8,0"
-                                 Padding="0"
-                                 VerticalContentAlignment="Center"
                                  Background="Transparent"
                                  BorderThickness="0"
+                                 Padding="0"
+                                 VerticalContentAlignment="Center"
                                  Foreground="{StaticResource PrimaryTextBrush}"
                                  CaretBrush="{StaticResource AccentBrush}"
                                  FontFamily="Segoe UI Variable Small"
                                  FontSize="15"
-                                 KeyDown="QuickInputTextBoxKeyDown"
-                                 ToolTip="Create a new th1ng"/>
-
-                    </Border>
-
-                    <!-- SUBMIT -->
-
-                    <Button Grid.Column="1"
-                            Width="32"
-                            Height="32"
-                            Margin="5,0,0,0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Click="QuickInputSubmitClick"
-                            Background="{StaticResource AccentBrush}"
-                            BorderThickness="0"
-                            Padding="0"
-                            Cursor="Hand"
-                            ToolTip="Create th1ng">
-
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-
-                                <Border Background="{TemplateBinding Background}"
-                                        CornerRadius="7">
-
-                                    <ContentPresenter HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"/>
-
-                                </Border>
-
-                            </ControlTemplate>
-                        </Button.Template>
-
-                        <TextBlock Text="↵"
-                                   Margin="0,-2,0,0"
-                                   FontFamily="Segoe UI Variable Small"
-                                   FontSize="20"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource WindowBackgroundBrush}"/>
-
-                    </Button>
-
-                </Grid>
-
-            </Border>
-
+                                 TextChanged="QuickInputTextBoxTextChanged"
+                                 KeyDown="QuickInputTextBoxKeyDown"/>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
-
     </Border>
-
 </Window>

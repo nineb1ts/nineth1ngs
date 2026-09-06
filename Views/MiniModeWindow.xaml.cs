@@ -6,6 +6,7 @@ using System.Windows.Media.Animation;
 using System.Runtime.InteropServices;
 using nineth1ngs.Services;
 using nineth1ngs.ViewModels;
+using System.Windows.Threading;
 
 namespace nineth1ngs.Views;
 
@@ -14,12 +15,23 @@ public partial class MiniModeWindow : Window
     private readonly Action returnToNormal;
     private readonly Func<string, Task> submitQuickInput;
 
+    private readonly DispatcherTimer quickInputTimer;
+    private const double CollapsedHeight = 86;
+    private const double ExpandedHeight = 136;
+
     public MiniModeWindow(
     MainViewModel viewModel,
     Action returnToNormal,
     Func<string, Task> submitQuickInput)
     {
         InitializeComponent();
+
+        quickInputTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(10)
+        };
+
+        quickInputTimer.Tick += QuickInputTimerTick;
 
         DataContext = viewModel;
 
@@ -59,8 +71,9 @@ public partial class MiniModeWindow : Window
     public void ShowQuickInput()
     {
         QuickInputArea.Visibility = Visibility.Visible;
+        Height = ExpandedHeight;
 
-        Height = 136;
+        RestartQuickInputTimer();
 
         Activate();
 
@@ -68,18 +81,38 @@ public partial class MiniModeWindow : Window
         {
             QuickInputTextBox.Focus();
             Keyboard.Focus(QuickInputTextBox);
-
-            QuickInputTextBox.SelectAll();
+            QuickInputTextBox.CaretIndex = QuickInputTextBox.Text.Length;
         });
     }
 
     private void HideQuickInput()
     {
-        QuickInputArea.Visibility = Visibility.Collapsed;
+        quickInputTimer.Stop();
 
-        Height = 86;
+        QuickInputArea.Visibility = Visibility.Collapsed;
+        Height = CollapsedHeight;
 
         QuickInputTextBox.Clear();
+    }
+
+    private void RestartQuickInputTimer()
+    {
+        quickInputTimer.Stop();
+        quickInputTimer.Start();
+    }
+
+    private void QuickInputTimerTick(
+        object? sender,
+        EventArgs e)
+    {
+        HideQuickInput();
+    }
+
+    private void QuickInputTextBoxTextChanged(
+        object sender,
+        System.Windows.Controls.TextChangedEventArgs e)
+    {
+        RestartQuickInputTimer();
     }
 
     private async Task SubmitQuickInputAsync()
@@ -103,13 +136,13 @@ public partial class MiniModeWindow : Window
         if (e.Key == Key.Enter)
         {
             e.Handled = true;
-
             await SubmitQuickInputAsync();
+            return;
         }
-        else if (e.Key == Key.Escape)
+
+        if (e.Key == Key.Escape)
         {
             e.Handled = true;
-
             HideQuickInput();
         }
     }
@@ -155,20 +188,25 @@ public partial class MiniModeWindow : Window
         }
     }
 
-    private void MiniDragAreaMouseLeftButtonDown(
-        object sender,
-        MouseButtonEventArgs e)
+    private void MiniDragAreaMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left)
+        if (e.ChangedButton != MouseButton.Left)
         {
-            try
-            {
-                DragMove();
-                KeepOnWorkingArea();
-            }
-            catch (InvalidOperationException)
-            {
-            }
+            return;
+        }
+
+        if (QuickInputArea.Visibility == Visibility.Visible)
+        {
+            HideQuickInput();
+        }
+
+        try
+        {
+            DragMove();
+            KeepOnWorkingArea();
+        }
+        catch (InvalidOperationException)
+        {
         }
     }
 
