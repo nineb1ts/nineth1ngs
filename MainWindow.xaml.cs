@@ -55,8 +55,19 @@ public partial class MainWindow : Window
 
         if (WindowSettingsService.IsValid(settings))
         {
+            Width = Math.Clamp(
+                settings.Width,
+                MinWidth,
+                SystemParameters.WorkArea.Width);
+
+            Height = Math.Clamp(
+                settings.Height,
+                MinHeight,
+                SystemParameters.WorkArea.Height);
+
             Left = settings.Left;
             Top = settings.Top;
+
             WindowStartupLocation = WindowStartupLocation.Manual;
         }
 
